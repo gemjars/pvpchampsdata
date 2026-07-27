@@ -1,0 +1,12 @@
+{
+  "name": "kit-tournament-tracker",
+  "version": "1.0.0",
+  "description": "Webpage app to record and view kit tournament match results, stored in a JSON file.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

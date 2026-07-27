@@ -1,0 +1,71 @@
+[
+  {
+    "id": "1785159208497-ew3rzo",
+    "date": "2026-07-27",
+    "format": "bo3",
+    "player1": "coldi",
+    "player2": "swight",
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785160026940-lvzkwt",
+    "date": "2026-07-27",
+    "format": "bo5",
+    "player1": "coldi",
+    "player2": "immixed",
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  }
+]

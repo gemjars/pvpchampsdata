@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kit Tournament Tracker</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Kit Tournament Tracker</h1>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="history">Match History</button>
+      <button class="tab-btn" data-tab="players">Players</button>
+      <button class="tab-btn" data-tab="kits">Kits</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- MATCH HISTORY TAB -->
+    <section id="tab-history" class="tab-panel active">
+      <div class="panel-grid">
+        <div class="card">
+          <h2>Add New Match</h2>
+          <form id="match-form">
+            <div class="form-row">
+              <label>Date
+                <input type="date" id="match-date" required />
+              </label>
+              <label>Format
+                <select id="match-format">
+                  <option value="bo3">Best of 3</option>
+                  <option value="bo5">Best of 5</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>Player 1
+                <input type="text" id="player1-name" list="player-names" placeholder="Enter name" required />
+              </label>
+              <label>Player 2
+                <input type="text" id="player2-name" list="player-names" placeholder="Enter name" required />
+              </label>
+              <datalist id="player-names"></datalist>
+            </div>
+
+            <div id="pick-section" class="pick-section">
+              <p class="hint">Enter both player names, then choose kit picks below.</p>
+            </div>
+
+            <div id="games-section" class="games-section"></div>
+
+            <div class="form-actions">
+              <button type="button" id="build-games-btn">Set Up Games</button>
+              <button type="submit" id="save-match-btn" disabled>Save Match</button>
+              <span id="form-error" class="form-error"></span>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Recorded Matches</h2>
+          <div id="match-list" class="match-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYERS TAB -->
+    <section id="tab-players" class="tab-panel">
+      <div class="card">
+        <h2>Player Stats</h2>
+        <label>Select Player
+          <select id="player-select">
+            <option value="">-- Choose a player --</option>
+          </select>
+        </label>
+        <div id="player-details"></div>
+      </div>
+    </section>
+
+    <!-- KITS TAB -->
+    <section id="tab-kits" class="tab-panel">
+      <div class="card">
+        <h2>Kit Stats</h2>
+        <div id="kit-stats"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
