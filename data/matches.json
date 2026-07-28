@@ -1,10 +1,1008 @@
 [
   {
-    "id": "1785159208497-ew3rzo",
-    "round": 1,
+    "id": "1785252726575-jkbnx7",
+    "round": "1",
     "format": "bo3",
-    "player1": "coldi",
-    "player2": "swight",
+    "player1": "coldified",
+    "player2": "MyDogIsConfused",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "MSMP"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252766208-dt9aeq",
+    "round": "1",
+    "format": "bo3",
+    "player1": "BLMcheat",
+    "player2": "mikagoated",
+    "picks": {
+      "player1": [
+        "MSMP"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "MSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 2,
+        "score2": 3,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785252824102-7nk0rg",
+    "round": "1",
+    "format": "bo3",
+    "player1": "ImMixed",
+    "player2": "TheobaldTheBird",
+    "picks": {
+      "player1": [
+        "MSMP"
+      ],
+      "player2": [
+        "Sword"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "MSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 3,
+        "winner": "player2"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "decider",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252862693-xw6g3l",
+    "round": "1",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "TungTungTungkiks",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252894526-lkrywr",
+    "round": "1",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "DarkKnightAragon",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "MSMP"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252934035-rzyhwc",
+    "round": "1",
+    "format": "bo3",
+    "player1": "JACKS5ON",
+    "player2": "sweatgod",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 1,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252976745-zz2p69",
+    "round": "1",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "SpawnPlayer",
+    "picks": {
+      "player1": [
+        "MSMP"
+      ],
+      "player2": [
+        "Sword"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "MSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player2",
+        "score1": 3,
+        "score2": 1,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253013088-zcnetl",
+    "round": "1",
+    "format": "bo3",
+    "player1": "Sizierung",
+    "player2": "Ricardoxx_",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253062862-12neaq",
+    "round": "LB1",
+    "format": "bo3",
+    "player1": "BLMcheat",
+    "player2": "MyDogIsConfused",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253111159-lmkry3",
+    "round": "LB1",
+    "format": "bo3",
+    "player1": "TungTungTungkiks",
+    "player2": "TheobaldTheBird",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253140287-976wvx",
+    "round": "LB1",
+    "format": "bo3",
+    "player1": "sweatgod",
+    "player2": "DarkKnightAragon",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "MSMP"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253176119-lkandv",
+    "round": "LB1",
+    "format": "bo3",
+    "player1": "Ricardoxx_",
+    "player2": "SpawnPlayer",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253202244-eqs8lm",
+    "round": "2",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "mikagoated",
+    "picks": {
+      "player1": [
+        "MSMP"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "MSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253257078-0leo30",
+    "round": "2",
+    "format": "bo3",
+    "player1": "ImMixed",
+    "player2": "ninorc15",
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "Sword"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player2",
+        "score1": 3,
+        "score2": 2,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253290169-e0pnrj",
+    "round": "2",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "JACKS5ON",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Sword"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player2",
+        "score1": 3,
+        "score2": 2,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253339037-06rk64",
+    "round": "2",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "Sizierung",
+    "picks": {
+      "player1": [
+        "MSMP"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "MSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253381049-fxrtij",
+    "round": "LB2",
+    "format": "bo3",
+    "player1": "Sizierung",
+    "player2": "BLMcheat",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "MSMP"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253427356-o95q3d",
+    "round": "LB2",
+    "format": "bo3",
+    "player1": "JACKS5ON",
+    "player2": "TungTungTungkiks",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253460683-d8pvqh",
+    "round": "LB2",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "sweatgod",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253503149-ae4xu0",
+    "round": "LB2",
+    "format": "bo3",
+    "player1": "mikagoated",
+    "player2": "Ricardoxx_",
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253535490-cauz6x",
+    "round": "3",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "ImMixed",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253566980-hwgkpa",
+    "round": "3",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "Freekee_Fang",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "MSMP"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253597399-a96kpx",
+    "round": "LB3",
+    "format": "bo3",
+    "player1": "JACKS5ON",
+    "player2": "BLMcheat",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253644215-3bhdoc",
+    "round": "LB3",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "Ricardoxx_",
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253684324-g3bf8m",
+    "round": "LB4",
+    "format": "bo3",
+    "player1": "ImMixed",
+    "player2": "BLMcheat",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253712311-0wh85h",
+    "round": "LB4",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "Ricardoxx_",
+    "picks": {
+      "player1": [
+        "MSMP"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "MSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253759920-mnesh4",
+    "round": "LB5",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "ImMixed",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "MSMP"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 3,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253802990-kzrjrg",
+    "round": "Upper Final",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "Swight",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Spear"
+    },
     "games": [
       {
         "kit": "Sword",
@@ -31,24 +1029,35 @@
     "winner": "player1"
   },
   {
-    "id": "1785160026940-lvzkwt",
-    "round": 2,
+    "id": "1785253870252-j9pjd1",
+    "round": "Lower Final",
     "format": "bo5",
-    "player1": "coldi",
-    "player2": "immixed",
+    "player1": "Swight",
+    "player2": "ImMixed",
+    "picks": {
+      "player1": [
+        "UHC",
+        "Sword"
+      ],
+      "player2": [
+        "Cart",
+        "MSMP"
+      ],
+      "decider": "Spear"
+    },
     "games": [
-      {
-        "kit": "Sword",
-        "pickedBy": "player1",
-        "score1": 3,
-        "score2": 0,
-        "winner": "player1"
-      },
       {
         "kit": "UHC",
         "pickedBy": "player1",
         "score1": 2,
         "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 2,
         "winner": "player1"
       },
       {
@@ -61,23 +1070,30 @@
       {
         "kit": "MSMP",
         "pickedBy": "player2",
-        "score1": 1,
-        "score2": 0,
-        "winner": "player1"
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
       }
     ],
-    "winner": "player1"
+    "winner": "player2"
   },
   {
-    "id": "1785238938999-6avrtg",
+    "id": "1785253905222-54yd74",
     "round": "Grand Final",
     "format": "grandfinal",
-    "player1": "coldi",
-    "player2": "immixed",
+    "player1": "coldified",
+    "player2": "ImMixed",
     "picks": {
       "player1": [
-        "Sword",
         "UHC",
+        "Sword",
         "MSMP"
       ],
       "player2": [
@@ -87,16 +1103,16 @@
     },
     "games": [
       {
-        "kit": "Sword",
+        "kit": "UHC",
         "pickedBy": "player1",
-        "score1": 3,
+        "score1": 2,
         "score2": 0,
         "winner": "player1"
       },
       {
-        "kit": "UHC",
+        "kit": "Sword",
         "pickedBy": "player1",
-        "score1": 2,
+        "score1": 3,
         "score2": 0,
         "winner": "player1"
       },
