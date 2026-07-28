@@ -361,6 +361,20 @@ button.danger {
   font-size: 0.75rem;
 }
 
+.match-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.edit-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 10px;
+  font-size: 0.75rem;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -380,6 +394,31 @@ th {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+}
+
+.match-history-row {
+  cursor: pointer;
+}
+
+.match-history-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.match-history-detail {
+  display: none;
+}
+
+.match-history-detail.open {
+  display: table-row;
+}
+
+.match-history-detail td {
+  background: var(--panel);
+  padding: 8px 14px;
+}
+
+.match-history-detail .game-line:last-child {
+  border-bottom: none;
 }
 
 .stat-cards {
@@ -430,6 +469,14 @@ th {
 
 .result-pill.loss {
   background: rgba(224,92,92,0.15);
+  color: var(--loss);
+}
+
+.game-line strong.win {
+  color: var(--win);
+}
+
+.game-line strong.loss {
   color: var(--loss);
 }
 

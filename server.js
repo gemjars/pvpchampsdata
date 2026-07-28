@@ -27,8 +27,9 @@ async function writeMatches(matches) {
 function isValidMatch(m) {
   return (
     m &&
-    typeof m.date === "string" &&
-    (m.format === "bo3" || m.format === "bo5") &&
+    ((typeof m.round === "string" && m.round.trim().length > 0) ||
+      (typeof m.round === "number" && Number.isFinite(m.round))) &&
+    (m.format === "bo3" || m.format === "bo5" || m.format === "grandfinal") &&
     typeof m.player1 === "string" &&
     m.player1.trim() &&
     typeof m.player2 === "string" &&
@@ -43,7 +44,12 @@ function isValidMatch(m) {
         Number.isFinite(g.score2) &&
         ["player1", "player2"].includes(g.winner),
     ) &&
-    ["player1", "player2"].includes(m.winner)
+    ["player1", "player2"].includes(m.winner) &&
+    (m.picks === undefined ||
+      (m.picks &&
+        Array.isArray(m.picks.player1) &&
+        Array.isArray(m.picks.player2) &&
+        typeof m.picks.decider === "string"))
   );
 }
 
@@ -68,10 +74,11 @@ app.post("/api/matches", async (req, res) => {
     const matches = await readMatches();
     const match = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      date: body.date,
+      round: typeof body.round === "string" ? body.round.trim() : body.round,
       format: body.format,
       player1: body.player1.trim(),
       player2: body.player2.trim(),
+      picks: body.picks,
       games: body.games.map((g) => ({
         kit: g.kit,
         pickedBy: g.pickedBy,
@@ -87,6 +94,43 @@ app.post("/api/matches", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to save match" });
+  }
+});
+
+// PUT (update) an existing match by id
+app.put("/api/matches/:id", async (req, res) => {
+  try {
+    const body = req.body;
+    if (!isValidMatch(body)) {
+      return res.status(400).json({ error: "Invalid match data" });
+    }
+    const matches = await readMatches();
+    const idx = matches.findIndex((m) => m.id === req.params.id);
+    if (idx === -1) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+    const updated = {
+      id: req.params.id,
+      round: typeof body.round === "string" ? body.round.trim() : body.round,
+      format: body.format,
+      player1: body.player1.trim(),
+      player2: body.player2.trim(),
+      picks: body.picks,
+      games: body.games.map((g) => ({
+        kit: g.kit,
+        pickedBy: g.pickedBy,
+        score1: g.score1,
+        score2: g.score2,
+        winner: g.winner,
+      })),
+      winner: body.winner,
+    };
+    matches[idx] = updated;
+    await writeMatches(matches);
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update match" });
   }
 });
 

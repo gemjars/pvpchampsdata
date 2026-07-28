@@ -1,7 +1,7 @@
 [
   {
     "id": "1785159208497-ew3rzo",
-    "date": "2026-07-27",
+    "round": 1,
     "format": "bo3",
     "player1": "coldi",
     "player2": "swight",
@@ -32,7 +32,7 @@
   },
   {
     "id": "1785160026940-lvzkwt",
-    "date": "2026-07-27",
+    "round": 2,
     "format": "bo5",
     "player1": "coldi",
     "player2": "immixed",
@@ -61,6 +61,55 @@
       {
         "kit": "MSMP",
         "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785238938999-6avrtg",
+    "round": "Grand Final",
+    "format": "grandfinal",
+    "player1": "coldi",
+    "player2": "immixed",
+    "picks": {
+      "player1": [
+        "Sword",
+        "UHC",
+        "MSMP"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "MSMP",
+        "pickedBy": "player1",
         "score1": 1,
         "score2": 0,
         "winner": "player1"

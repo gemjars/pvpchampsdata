@@ -5,6 +5,8 @@ const API_URL = "/api/matches";
 let matches = [];
 let pendingGames = null; // games array built by "Set Up Games" before save
 let currentEvaluation = null; // { finalGames, winner } once the match has been clinched
+let currentPicks = null; // { player1: [kits], player2: [kits], decider } for the in-progress form
+let editingMatchId = null; // set while editing an existing match instead of creating a new one
 
 async function fetchMatches() {
   const res = await fetch(API_URL);
@@ -32,6 +34,19 @@ async function deleteMatchOnServer(id) {
   }
 }
 
+async function updateMatchOnServer(id, match) {
+  const res = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(match),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || "Failed to update match on server");
+  }
+  return res.json();
+}
+
 // ---------- Tab Navigation ----------
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -47,7 +62,7 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 });
 
 // ---------- Form Elements ----------
-const dateInput = document.getElementById("match-date");
+const roundInput = document.getElementById("match-round");
 const formatSelect = document.getElementById("match-format");
 const player1Input = document.getElementById("player1-name");
 const player2Input = document.getElementById("player2-name");
@@ -55,10 +70,10 @@ const pickSection = document.getElementById("pick-section");
 const gamesSection = document.getElementById("games-section");
 const buildGamesBtn = document.getElementById("build-games-btn");
 const saveMatchBtn = document.getElementById("save-match-btn");
+const cancelEditBtn = document.getElementById("cancel-edit-btn");
+const formHeading = document.getElementById("match-form-heading");
 const formError = document.getElementById("form-error");
 const matchForm = document.getElementById("match-form");
-
-dateInput.value = new Date().toISOString().slice(0, 10);
 
 [formatSelect, player1Input, player2Input].forEach((el) => {
   el.addEventListener("input", () => {
@@ -67,8 +82,22 @@ dateInput.value = new Date().toISOString().slice(0, 10);
   });
 });
 
-function picksEachForFormat(format) {
-  return format === "bo5" ? 2 : 1;
+function picksForFormat(format) {
+  if (format === "bo5") return { p1: 2, p2: 2 };
+  if (format === "grandfinal") return { p1: 3, p2: 1 };
+  return { p1: 1, p2: 1 }; // bo3
+}
+
+function formatLabel(format) {
+  if (format === "bo5") return "Best of 5";
+  if (format === "grandfinal") return "Grand Final";
+  return "Best of 3";
+}
+
+function formatShortLabel(format) {
+  if (format === "bo5") return "Bo5";
+  if (format === "grandfinal") return "GF";
+  return "Bo3";
 }
 
 function resetGamesSection() {
@@ -93,11 +122,11 @@ function renderPickSection() {
     return;
   }
 
-  const picksEach = picksEachForFormat(formatSelect.value);
+  const picks = picksForFormat(formatSelect.value);
 
   let html = "";
-  html += buildPickGroup("p1", p1, picksEach);
-  html += buildPickGroup("p2", p2, picksEach);
+  html += buildPickGroup("p1", p1, picks.p1);
+  html += buildPickGroup("p2", p2, picks.p2);
   html += `<div class="pick-group" id="decider-group">
     <h4>Decider</h4>
     <div class="pick-row" id="decider-row"></div>
@@ -181,6 +210,29 @@ function renderDeciderRow(chosenValues) {
   }
 }
 
+// Builds the ordered list of games as they are actually played.
+// Grand Final is not simply "all of player1's picks, then player2's pick":
+// the real play order interleaves player2's single pick between player1's
+// second and third picks: P1 pick1, P1 pick2, P2 pick1, P1 pick3, Decider.
+function buildPlayOrder(format, p1Picks, p2Picks, decider) {
+  let picks;
+  if (format === "grandfinal") {
+    picks = [
+      { kit: p1Picks[0], pickedBy: "player1" },
+      { kit: p1Picks[1], pickedBy: "player1" },
+      { kit: p2Picks[0], pickedBy: "player2" },
+      { kit: p1Picks[2], pickedBy: "player1" },
+    ];
+  } else {
+    picks = [
+      ...p1Picks.map((kit) => ({ kit, pickedBy: "player1" })),
+      ...p2Picks.map((kit) => ({ kit, pickedBy: "player2" })),
+    ];
+  }
+  picks.push({ kit: decider, pickedBy: "decider" });
+  return picks;
+}
+
 // ---------- Build Games ----------
 buildGamesBtn.addEventListener("click", () => {
   formError.textContent = "";
@@ -207,12 +259,9 @@ buildGamesBtn.addEventListener("click", () => {
     return;
   }
 
-  const games = [
-    ...p1Picks.map((kit) => ({ kit, pickedBy: "player1" })),
-    ...p2Picks.map((kit) => ({ kit, pickedBy: "player2" })),
-    { kit: decider, pickedBy: "decider" },
-  ];
+  const games = buildPlayOrder(formatSelect.value, p1Picks, p2Picks, decider);
 
+  currentPicks = { player1: p1Picks, player2: p2Picks, decider };
   pendingGames = games;
   renderGamesSection(games, p1, p2);
 });
@@ -385,27 +434,39 @@ matchForm.addEventListener("submit", async (e) => {
     return;
   }
 
+  const round = roundInput.value.trim();
+  if (!round) {
+    formError.textContent = "Enter a round.";
+    return;
+  }
+
   const p1 = player1Input.value.trim();
   const p2 = player2Input.value.trim();
-  const date = dateInput.value;
   const format = formatSelect.value;
 
   const matchPayload = {
-    date,
+    round,
     format,
     player1: p1,
     player2: p2,
+    picks: currentPicks,
     games: currentEvaluation.finalGames,
     winner: currentEvaluation.winner,
   };
 
   saveMatchBtn.disabled = true;
   try {
-    const savedMatch = await createMatchOnServer(matchPayload);
-    matches.push(savedMatch);
+    let savedMatch;
+    if (editingMatchId) {
+      savedMatch = await updateMatchOnServer(editingMatchId, matchPayload);
+      matches = matches.map((m) => (m.id === savedMatch.id ? savedMatch : m));
+    } else {
+      savedMatch = await createMatchOnServer(matchPayload);
+      matches.push(savedMatch);
+    }
 
+    exitEditMode();
     matchForm.reset();
-    dateInput.value = new Date().toISOString().slice(0, 10);
     resetGamesSection();
     renderPickSection();
     renderAll();
@@ -416,6 +477,86 @@ matchForm.addEventListener("submit", async (e) => {
   }
 });
 
+function exitEditMode() {
+  editingMatchId = null;
+  currentPicks = null;
+  formHeading.textContent = "Add New Match";
+  saveMatchBtn.textContent = "Save Match";
+  cancelEditBtn.hidden = true;
+}
+
+cancelEditBtn.addEventListener("click", () => {
+  exitEditMode();
+  matchForm.reset();
+  resetGamesSection();
+  renderPickSection();
+});
+
+function startEditMatch(id) {
+  const match = matches.find((m) => m.id === id);
+  if (!match) return;
+
+  editingMatchId = id;
+
+  roundInput.value = match.round;
+  formatSelect.value = match.format;
+  player1Input.value = match.player1;
+  player2Input.value = match.player2;
+
+  renderPickSection();
+
+  const p1Kits = match.picks
+    ? match.picks.player1
+    : match.games.filter((g) => g.pickedBy === "player1").map((g) => g.kit);
+  const p2Kits = match.picks
+    ? match.picks.player2
+    : match.games.filter((g) => g.pickedBy === "player2").map((g) => g.kit);
+  const deciderKit = match.picks
+    ? match.picks.decider
+    : (match.games.find((g) => g.pickedBy === "decider") || {}).kit;
+
+  p1Kits.forEach((kit, i) => {
+    const sel = document.getElementById(`p1-pick-${i}`);
+    if (sel) sel.value = kit;
+  });
+  p2Kits.forEach((kit, i) => {
+    const sel = document.getElementById(`p2-pick-${i}`);
+    if (sel) sel.value = kit;
+  });
+
+  updatePickOptions();
+
+  const deciderEl = document.getElementById("decider-select");
+  if (deciderEl && deciderKit) deciderEl.value = deciderKit;
+
+  currentPicks = { player1: p1Kits, player2: p2Kits, decider: deciderKit };
+  pendingGames = buildPlayOrder(match.format, p1Kits, p2Kits, deciderKit);
+
+  renderGamesSection(pendingGames, match.player1, match.player2);
+
+  pendingGames.forEach((pg, idx) => {
+    const playedGame = match.games.find((g) => g.kit === pg.kit);
+    if (!playedGame) return;
+    const s1 = gamesSection.querySelector(
+      `.score-input[data-idx="${idx}"][data-player="1"]`,
+    );
+    const s2 = gamesSection.querySelector(
+      `.score-input[data-idx="${idx}"][data-player="2"]`,
+    );
+    if (s1) s1.value = playedGame.score1;
+    if (s2) s2.value = playedGame.score2;
+  });
+
+  updateGameProgress();
+
+  formHeading.textContent = "Edit Match";
+  saveMatchBtn.textContent = "Update Match";
+  cancelEditBtn.hidden = false;
+
+  document.querySelector('.tab-btn[data-tab="history"]')?.click();
+  matchForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 // ---------- Match List ----------
 function renderMatchList() {
   const container = document.getElementById("match-list");
@@ -424,7 +565,14 @@ function renderMatchList() {
     return;
   }
 
-  const sorted = [...matches].sort((a, b) => (a.date < b.date ? 1 : -1));
+  const sorted = [...matches].sort((a, b) => {
+    const cmp = String(b.round).localeCompare(String(a.round), undefined, {
+      numeric: true,
+      sensitivity: "base",
+    });
+    if (cmp !== 0) return cmp;
+    return a.id < b.id ? 1 : -1;
+  });
 
   container.innerHTML = sorted
     .map((m) => {
@@ -459,9 +607,12 @@ function renderMatchList() {
               <span class="${m.winner === "player2" ? "win" : ""}">${escapeHtml(m.player2)}</span>
               &nbsp;(${p1Wins}-${p2Wins})
             </div>
-            <div class="match-sub">${m.date} • ${m.format === "bo5" ? "Best of 5" : "Best of 3"} • Winner: ${escapeHtml(winnerName)}</div>
+            <div class="match-sub">Round ${m.round} • ${formatLabel(m.format)} • Winner: ${escapeHtml(winnerName)}</div>
           </div>
-          <button class="delete-btn" data-delete="${m.id}">Delete</button>
+          <div class="match-card-actions">
+            <button class="secondary edit-btn" data-edit="${m.id}">Edit</button>
+            <button class="delete-btn" data-delete="${m.id}">Delete</button>
+          </div>
         </div>
         <div class="match-card-body">${gamesHtml}</div>
       </div>`;
@@ -470,7 +621,8 @@ function renderMatchList() {
 
   container.querySelectorAll(".match-card-header").forEach((header) => {
     header.addEventListener("click", (e) => {
-      if (e.target.closest(".delete-btn")) return;
+      if (e.target.closest(".delete-btn") || e.target.closest(".edit-btn"))
+        return;
       header.parentElement
         .querySelector(".match-card-body")
         .classList.toggle("open");
@@ -489,6 +641,13 @@ function renderMatchList() {
         console.error(err);
         alert(err.message || "Failed to delete match.");
       }
+    });
+  });
+
+  container.querySelectorAll("[data-edit]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      startEditMatch(btn.dataset.edit);
     });
   });
 }
@@ -548,8 +707,12 @@ function renderPlayerDetails(name) {
 
   let wins = 0;
   let losses = 0;
-  const kitPickStats = {}; // kit -> { picked: n, won: n }
-  KITS.forEach((k) => (kitPickStats[k] = { picked: 0, won: 0 }));
+  const kitPickStats = {}; // kit -> { picked: n, won: n } — only games this player personally picked
+  const kitOverallStats = {}; // kit -> { played: n, won: n } — every game this player played on that kit
+  KITS.forEach((k) => {
+    kitPickStats[k] = { picked: 0, won: 0 };
+    kitOverallStats[k] = { played: 0, won: 0 };
+  });
 
   const matchRows = playerMatches
     .map((m) => {
@@ -563,18 +726,44 @@ function renderPlayerDetails(name) {
       const oppKitWins = m.games.length - myKitWins;
 
       m.games.forEach((g) => {
+        kitOverallStats[g.kit].played++;
+        if (g.winner === myRole) kitOverallStats[g.kit].won++;
+
         if (g.pickedBy === myRole) {
           kitPickStats[g.kit].picked++;
           if (g.winner === myRole) kitPickStats[g.kit].won++;
         }
       });
 
-      return `<tr>
-        <td>${m.date}</td>
+      const gameLines = m.games
+        .map((g) => {
+          const pickerLabel =
+            g.pickedBy === "decider"
+              ? "Decider"
+              : g.pickedBy === myRole
+                ? escapeHtml(name)
+                : escapeHtml(opponent);
+          const badgeClass =
+            g.pickedBy === "decider" ? "badge decider" : "badge";
+          const myScore = isP1 ? g.score1 : g.score2;
+          const oppScore = isP1 ? g.score2 : g.score1;
+          const gameWon = g.winner === myRole;
+          return `<div class="game-line">
+            <span>${g.kit} <span class="${badgeClass}">${pickerLabel}</span></span>
+            <span>${myScore} - ${oppScore} <strong class="${gameWon ? "win" : "loss"}">(${gameWon ? "WIN" : "LOSS"})</strong></span>
+          </div>`;
+        })
+        .join("");
+
+      return `<tr class="match-history-row" data-history-id="${m.id}">
+        <td>${m.round}</td>
         <td>${escapeHtml(opponent)}</td>
-        <td>${m.format === "bo5" ? "Bo5" : "Bo3"}</td>
+        <td>${formatShortLabel(m.format)}</td>
         <td><span class="result-pill ${won ? "win" : "loss"}">${won ? "WIN" : "LOSS"}</span></td>
         <td>${myKitWins} - ${oppKitWins}</td>
+      </tr>
+      <tr class="match-history-detail" data-detail-for="${m.id}">
+        <td colspan="5">${gameLines}</td>
       </tr>`;
     })
     .join("");
@@ -594,6 +783,17 @@ function renderPlayerDetails(name) {
     </tr>`;
   }).join("");
 
+  const kitOverallRows = KITS.map((k) => {
+    const stat = kitOverallStats[k];
+    const rate = stat.played ? Math.round((stat.won / stat.played) * 100) : 0;
+    return `<tr>
+      <td>${k}</td>
+      <td>${stat.played}</td>
+      <td>${stat.won}</td>
+      <td>${stat.played ? rate + "%" : "—"}</td>
+    </tr>`;
+  }).join("");
+
   container.innerHTML = `
     <div class="stat-cards">
       <div class="stat-box"><div class="value">${playerMatches.length}</div><div class="label">Matches</div></div>
@@ -601,6 +801,12 @@ function renderPlayerDetails(name) {
       <div class="stat-box"><div class="value">${losses}</div><div class="label">Losses</div></div>
       <div class="stat-box"><div class="value">${winRate}%</div><div class="label">Win Rate</div></div>
     </div>
+
+    <h3>Overall Win Rate by Kit</h3>
+    <table>
+      <thead><tr><th>Kit</th><th>Games Played</th><th>Games Won</th><th>Win Rate</th></tr></thead>
+      <tbody>${kitOverallRows}</tbody>
+    </table>
 
     <h3>Kit Picks by ${escapeHtml(name)}</h3>
     <table>
@@ -610,10 +816,20 @@ function renderPlayerDetails(name) {
 
     <h3>Match History</h3>
     <table>
-      <thead><tr><th>Date</th><th>Opponent</th><th>Format</th><th>Result</th><th>Kit Score</th></tr></thead>
+      <thead><tr><th>Round</th><th>Opponent</th><th>Format</th><th>Result</th><th>Kit Score</th></tr></thead>
       <tbody>${matchRows}</tbody>
     </table>
   `;
+
+  container.querySelectorAll(".match-history-row").forEach((row) => {
+    row.addEventListener("click", () => {
+      const id = row.dataset.historyId;
+      const detail = container.querySelector(
+        `.match-history-detail[data-detail-for="${id}"]`,
+      );
+      if (detail) detail.classList.toggle("open");
+    });
+  });
 }
 
 // ---------- Kits Tab ----------

@@ -21,16 +21,17 @@
     <section id="tab-history" class="tab-panel active">
       <div class="panel-grid">
         <div class="card">
-          <h2>Add New Match</h2>
+          <h2 id="match-form-heading">Add New Match</h2>
           <form id="match-form">
             <div class="form-row">
-              <label>Date
-                <input type="date" id="match-date" required />
+              <label>Round
+                <input type="text" id="match-round" placeholder="Round # or name" required />
               </label>
               <label>Format
                 <select id="match-format">
                   <option value="bo3">Best of 3</option>
                   <option value="bo5">Best of 5</option>
+                  <option value="grandfinal">Grand Final</option>
                 </select>
               </label>
             </div>
@@ -54,6 +55,7 @@
             <div class="form-actions">
               <button type="button" id="build-games-btn">Set Up Games</button>
               <button type="submit" id="save-match-btn" disabled>Save Match</button>
+              <button type="button" id="cancel-edit-btn" class="secondary" hidden>Cancel Edit</button>
               <span id="form-error" class="form-error"></span>
             </div>
           </form>
