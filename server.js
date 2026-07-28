@@ -4,7 +4,12 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, "data", "matches.json");
+
+// When bundled into a standalone executable (pkg), __dirname points inside a
+// read-only virtual snapshot. Store the data file next to the real .exe
+// instead so match history persists and survives updates.
+const BASE_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
+const DATA_FILE = path.join(BASE_DIR, "data", "matches.json");
 
 app.use(express.json());
 app.use(express.static(__dirname));

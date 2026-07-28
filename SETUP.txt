@@ -77,3 +77,32 @@ NOTES
   port, for example:
     $env:PORT=3001; npm start
   then browse to http://localhost:3001 instead.
+
+8. STANDALONE .EXE (no Node.js install needed)
+-------------------------------------------------
+If you'd rather hand someone a single file that just runs (no Node.js,
+no "npm install"), build a standalone Windows executable:
+
+  a) In this project folder (with node_modules already installed), run:
+       npm install --save-dev "@yao-pkg/pkg"
+       npm run build
+
+  b) This creates dist\kit-tournament-tracker.exe - a single file with
+     Node.js and the whole app bundled inside.
+
+  c) Copy just that .exe to any Windows machine (any folder) and
+     double-click it, or run it from a terminal:
+       .\kit-tournament-tracker.exe
+
+  d) It starts the same server at http://localhost:3000. It creates its
+     own "data" folder (with matches.json) next to wherever the .exe is
+     placed, so match history persists between runs as long as you keep
+     using the same copy of the .exe from the same folder.
+
+  e) To use a different port:
+       $env:PORT=3001; .\kit-tournament-tracker.exe
+
+  Note: the build in step (a) only needs to happen once, on a dev
+  machine with Node.js installed. The resulting .exe itself needs
+  nothing installed on the machines it's copied to. To rebuild after
+  changing the app's code, just run "npm run build" again.
