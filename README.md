@@ -1,36 +1,36 @@
 KIT TOURNAMENT TRACKER - SETUP GUIDE
 =====================================
 
-1. INSTALL NODE.JS (if not already installed)
------------------------------------------------
-Check first by opening a terminal and running:
-  node -v
+# 1 - INSTALL NODE.JS (if not already installed)
+
+Check first by opening a terminal and running: node -v
 
 If that fails, install Node.js LTS from https://nodejs.org
 Any Node.js version 18 or newer works.
 
-2. INSTALL DEPENDENCIES
 -------------------------
-Open a terminal in the extracted folder and run:
-  npm install
 
-3. START THE SERVER
----------------------
-In the same terminal, run:
-  npm start
+# 2 - INSTALL DEPENDENCIES
+Open a terminal in the extracted folder and run: `npm install`
 
-You should see:
-  Kit Tournament Tracker running at http://localhost:3000
+-------------------------
+
+# 3 - START THE SERVER
+
+In the same terminal, run: `npm start`
+
+You should see: Kit Tournament Tracker running at `http://localhost:3000`
 
 Leave this terminal window open - the server must keep running while you use the app.
 
-4. OPEN THE APP
------------------
-Go to this address in your browser:
-  http://localhost:3000
+---------------------
 
-5. USE THE APP
+# 4 - OPEN THE APP
+Go to this address in your browser: `http://localhost:3000`
+
 -----------------
+
+# 5 - USE THE APP
 Match History tab: 
 - Add new matches by inputting round name, format, player1 name, player 2 name
 - Grand Final format will give player1 three kit picks
@@ -50,6 +50,7 @@ Comparison:
 
 Bracket: 
 - View and edit each match in the bracket
+-----------------
 
 NOTES
 -------
