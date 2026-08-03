@@ -19,7 +19,8 @@
       "index.html",
       "styles.css",
       "app.js",
-      "data/matches.json"
+      "data/matches.json",
+      "data/bracket.json"
     ],
     "targets": [
       "node20-win-x64"

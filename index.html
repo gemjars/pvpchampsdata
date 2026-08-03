@@ -13,6 +13,8 @@
       <button class="tab-btn active" data-tab="history">Match History</button>
       <button class="tab-btn" data-tab="players">Players</button>
       <button class="tab-btn" data-tab="kits">Kits</button>
+      <button class="tab-btn" data-tab="comparison">Comparison</button>
+      <button class="tab-btn" data-tab="bracket">Bracket</button>
     </nav>
   </header>
 
@@ -88,7 +90,102 @@
         <div id="kit-stats"></div>
       </div>
     </section>
+
+    <!-- COMPARISON TAB -->
+    <section id="tab-comparison" class="tab-panel">
+      <div class="card">
+        <h2>Player Comparison</h2>
+        <div class="form-row">
+          <label>Player 1
+            <select id="compare-player1-select">
+              <option value="">-- Choose a player --</option>
+            </select>
+          </label>
+          <label>Player 2
+            <select id="compare-player2-select">
+              <option value="">-- Choose a player --</option>
+            </select>
+          </label>
+        </div>
+        <div id="comparison-stats"></div>
+      </div>
+
+      <div class="card">
+        <h2>Simulate Match</h2>
+        <p class="hint">
+          Predicts likely kit picks and a winner using each player's history.
+          Player 1 gets the Grand Final advantage picks (3 picks vs 1) if that
+          format is chosen.
+        </p>
+        <div class="form-row">
+          <label>Format
+            <select id="simulate-format">
+              <option value="bo3">Best of 3</option>
+              <option value="bo5">Best of 5</option>
+              <option value="grandfinal">Grand Final</option>
+            </select>
+          </label>
+          <button type="button" id="simulate-match-btn">Simulate Match</button>
+        </div>
+        <div id="simulate-result"></div>
+      </div>
+    </section>
+
+    <!-- BRACKET TAB -->
+    <section id="tab-bracket" class="tab-panel">
+      <div class="bracket-card">
+        <div class="bracket-header">
+          <h2>16-Player Double Elimination Bracket</h2>
+          <button type="button" id="bracket-reset-btn" class="secondary">
+            Clear All Assignments
+          </button>
+        </div>
+        <p class="hint">
+          Click any slot to assign one of your recorded matches to it. Click
+          an assigned slot to view the full match details.
+        </p>
+        <div class="bracket-scroll">
+          <div class="bracket-wrap" id="bracket-wrap">
+            <svg class="bracket-lines" id="bracket-lines"></svg>
+            <div class="bracket-section bracket-upper">
+              <div class="bracket-section-label">Winners Bracket</div>
+              <div class="bracket-rounds" id="bracket-upper-rounds"></div>
+            </div>
+            <div class="bracket-section bracket-lower">
+              <div class="bracket-section-label">Losers Bracket</div>
+              <div class="bracket-rounds" id="bracket-lower-rounds"></div>
+            </div>
+            <div class="bracket-section bracket-grandfinal">
+              <div class="bracket-section-label">Grand Final</div>
+              <div class="bracket-rounds" id="bracket-gf-rounds"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <!-- Bracket match detail modal -->
+  <div id="bracket-detail-modal" class="modal-overlay" hidden>
+    <div class="modal">
+      <button type="button" class="modal-close" id="bracket-detail-close">&times;</button>
+      <div id="bracket-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- Bracket match picker modal -->
+  <div id="bracket-picker-modal" class="modal-overlay" hidden>
+    <div class="modal">
+      <button type="button" class="modal-close" id="bracket-picker-close">&times;</button>
+      <h3 id="bracket-picker-heading">Assign a match</h3>
+      <input
+        type="text"
+        id="bracket-picker-search"
+        placeholder="Search by player name or round..."
+      />
+      <div id="bracket-picker-list" class="bracket-picker-list"></div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

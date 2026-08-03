@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 // instead so match history persists and survives updates.
 const BASE_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
 const DATA_FILE = path.join(BASE_DIR, "data", "matches.json");
+const BRACKET_FILE = path.join(BASE_DIR, "data", "bracket.json");
 
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -152,6 +153,67 @@ app.delete("/api/matches/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to delete match" });
+  }
+});
+
+// ---------- Bracket assignments ----------
+// The bracket is a fixed 16-player double-elimination layout defined on the
+// client. This just persists a map of { slotId: matchId } describing which
+// recorded match (if any) has been assigned to each bracket slot.
+
+async function readBracket() {
+  try {
+    const raw = await fs.readFile(BRACKET_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch (err) {
+    if (err.code === "ENOENT") return {};
+    throw err;
+  }
+}
+
+async function writeBracket(assignments) {
+  await fs.mkdir(path.dirname(BRACKET_FILE), { recursive: true });
+  await fs.writeFile(
+    BRACKET_FILE,
+    JSON.stringify(assignments, null, 2),
+    "utf-8",
+  );
+}
+
+function isValidBracket(body) {
+  return (
+    body &&
+    typeof body === "object" &&
+    !Array.isArray(body) &&
+    Object.entries(body).every(
+      ([slotId, matchId]) =>
+        typeof slotId === "string" && typeof matchId === "string",
+    )
+  );
+}
+
+// GET current bracket assignments
+app.get("/api/bracket", async (req, res) => {
+  try {
+    const assignments = await readBracket();
+    res.json(assignments);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to read bracket" });
+  }
+});
+
+// PUT (replace) bracket assignments
+app.put("/api/bracket", async (req, res) => {
+  try {
+    if (!isValidBracket(req.body)) {
+      return res.status(400).json({ error: "Invalid bracket data" });
+    }
+    await writeBracket(req.body);
+    res.json(req.body);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save bracket" });
   }
 });
 
