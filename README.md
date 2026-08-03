@@ -62,7 +62,4 @@ NOTES
     $env:PORT=3001; npm start
   then browse to http://localhost:3001 instead.
 
-
-  machine with Node.js installed. The resulting .exe itself needs
-  nothing installed on the machines it's copied to. To rebuild after
-  changing the app's code, just run "npm run build" again.
+- You can freely edit existing matches or add new ones. If you'd like to revert to the matches stored after PvP Champs 1, simply revert the files at https://github.com/gemjars/pvpchampsdata/tree/main/data 
