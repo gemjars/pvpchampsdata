@@ -1,6 +1,5 @@
 // ---------- Constants & State ----------
 const KITS = ["Sword", "UHC", "MSMP", "Cart", "Spear"];
-const API_URL = "/api/matches";
 
 // Kit values are kept as-is internally (matching stored/legacy data), but
 // some kits are shown under a different name in the UI.
@@ -16,42 +15,26 @@ let currentPicks = null; // { player1: [kits], player2: [kits], decider } for th
 let editingMatchId = null; // set while editing an existing match instead of creating a new one
 
 async function fetchMatches() {
-  const res = await fetch(API_URL);
-  if (!res.ok) throw new Error("Failed to load matches from server");
-  return res.json();
+  return DataStore.loadMatches();
 }
 
-async function createMatchOnServer(match) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(match),
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || "Failed to save match to server");
-  }
-  return res.json();
+async function createMatchOnServer(payload) {
+  const match = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    ...payload,
+  };
+  await DataStore.saveMatches([...matches, match]);
+  return match;
 }
 
 async function deleteMatchOnServer(id) {
-  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-  if (!res.ok && res.status !== 404) {
-    throw new Error("Failed to delete match on server");
-  }
+  await DataStore.saveMatches(matches.filter((m) => m.id !== id));
 }
 
-async function updateMatchOnServer(id, match) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(match),
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || "Failed to update match on server");
-  }
-  return res.json();
+async function updateMatchOnServer(id, payload) {
+  const updated = { id, ...payload };
+  await DataStore.saveMatches(matches.map((m) => (m.id === id ? updated : m)));
+  return updated;
 }
 
 // ---------- Tab Navigation ----------
@@ -1224,17 +1207,147 @@ async function init() {
   } catch (err) {
     console.error(err);
     document.getElementById("match-list").innerHTML =
-      `<p class="empty-state">Could not load matches from the server. Make sure the app is running via "npm start" and reload the page.</p>`;
+      `<p class="empty-state">Could not load match data. See the browser console for details.</p>`;
   }
   try {
     bracketAssignments = await fetchBracketAssignments();
   } catch (err) {
     console.error(err);
   }
+  await refreshStorageStatus();
   renderAll();
 }
 
 init();
+
+// ---------- Storage Bar (data folder connection status) ----------
+const storageStatusText = document.getElementById("storage-status-text");
+const connectFolderBtn = document.getElementById("connect-folder-btn");
+const exportMatchesBtn = document.getElementById("export-matches-btn");
+const exportBracketBtn = document.getElementById("export-bracket-btn");
+const importMatchesInput = document.getElementById("import-matches-input");
+const importBracketInput = document.getElementById("import-bracket-input");
+
+async function refreshStorageStatus() {
+  const connected = await DataStore.isConnected();
+  if (connected) {
+    storageStatusText.textContent =
+      "Connected — saving directly to data/matches.json and data/bracket.json.";
+    connectFolderBtn.textContent = "Change Data Folder";
+    connectFolderBtn.hidden = false;
+  } else if (DataStore.isFileSystemSupported) {
+    storageStatusText.textContent =
+      "Not connected — using this browser's local storage until you connect the data folder.";
+    connectFolderBtn.textContent = "Connect Data Folder";
+    connectFolderBtn.hidden = false;
+  } else {
+    storageStatusText.textContent =
+      "This browser can't save directly to files — using local storage. Use Export/Import to sync with data/*.json.";
+    connectFolderBtn.hidden = true;
+  }
+}
+
+connectFolderBtn.addEventListener("click", async () => {
+  try {
+    await DataStore.chooseDirectoryHandle();
+    await migrateLocalDataIntoFolderIfNeeded();
+    matches = await fetchMatches();
+    bracketAssignments = await fetchBracketAssignments();
+    await refreshStorageStatus();
+    renderAll();
+  } catch (err) {
+    console.error(err);
+    if (err.name !== "AbortError") {
+      alert(err.message || "Failed to connect the data folder.");
+    }
+  }
+});
+
+// If the newly-connected folder's files are empty but this browser already
+// holds data saved locally (from before a folder was connected), copy it
+// over once so nothing is lost.
+async function migrateLocalDataIntoFolderIfNeeded() {
+  const [folderMatches, folderBracket] = await Promise.all([
+    DataStore.loadMatches(),
+    DataStore.loadBracket(),
+  ]);
+  if (folderMatches.length === 0 && matches.length > 0) {
+    await DataStore.saveMatches(matches);
+  }
+  if (
+    Object.keys(folderBracket).length === 0 &&
+    Object.keys(bracketAssignments).length > 0
+  ) {
+    await DataStore.saveBracket(bracketAssignments);
+  }
+}
+
+function downloadJson(filename, data) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+exportMatchesBtn.addEventListener("click", () => {
+  downloadJson("matches.json", matches);
+});
+
+exportBracketBtn.addEventListener("click", () => {
+  downloadJson("bracket.json", bracketAssignments);
+});
+
+importMatchesInput.addEventListener("change", async () => {
+  const file = importMatchesInput.files[0];
+  importMatchesInput.value = "";
+  if (!file) return;
+  try {
+    const parsed = JSON.parse(await file.text());
+    if (!Array.isArray(parsed)) {
+      throw new Error("That file is not a matches.json array.");
+    }
+    if (
+      !confirm(
+        `Replace all ${matches.length} current matches with ${parsed.length} matches from this file?`,
+      )
+    ) {
+      return;
+    }
+    matches = parsed;
+    await DataStore.saveMatches(matches);
+    renderAll();
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to import matches.json.");
+  }
+});
+
+importBracketInput.addEventListener("change", async () => {
+  const file = importBracketInput.files[0];
+  importBracketInput.value = "";
+  if (!file) return;
+  try {
+    const parsed = JSON.parse(await file.text());
+    if (
+      typeof parsed !== "object" ||
+      Array.isArray(parsed) ||
+      parsed === null
+    ) {
+      throw new Error("That file is not a bracket.json object.");
+    }
+    bracketAssignments = parsed;
+    await DataStore.saveBracket(bracketAssignments);
+    renderAll();
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to import bracket.json.");
+  }
+});
 
 // ---------- Bracket Tab ----------
 // A standard 16-player double-elimination bracket layout (30 slots total).
@@ -1304,29 +1417,18 @@ const BRACKET_CONNECTIONS = [
   [["WBF", "LBF"], "GF"],
 ];
 
-const BRACKET_API_URL = "/api/bracket";
 const BRACKET_MATCH_H = 62;
 const BRACKET_GAP = 14;
 
 let bracketAssignments = {}; // slotId -> matchId
 
 async function fetchBracketAssignments() {
-  const res = await fetch(BRACKET_API_URL);
-  if (!res.ok) throw new Error("Failed to load bracket from server");
-  return res.json();
+  return DataStore.loadBracket();
 }
 
 async function saveBracketAssignments() {
-  const res = await fetch(BRACKET_API_URL, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(bracketAssignments),
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || "Failed to save bracket to server");
-  }
-  return res.json();
+  await DataStore.saveBracket(bracketAssignments);
+  return bracketAssignments;
 }
 
 function bracketSectionHeight(rounds) {

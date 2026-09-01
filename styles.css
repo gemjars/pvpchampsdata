@@ -1,15 +1,18 @@
 :root {
-  --bg: #0f1420;
-  --panel: #1a2235;
-  --panel-light: #232c42;
-  --border: #2e3a55;
-  --text: #e8ecf5;
-  --text-dim: #9aa5bd;
-  --accent: #5b8cff;
-  --accent-2: #ff9f5b;
-  --win: #4caf50;
-  --loss: #e05c5c;
-  --radius: 10px;
+  --bg: #0a0b10;
+  --panel: #11131b;
+  --panel-light: #171a24;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #eef1f7;
+  --text-dim: #aeb6c6;
+  --text-mute: #727c92;
+  --accent: #e7c163;
+  --accent-ink: #1b1303;
+  --win: #4ade80;
+  --loss: #f87171;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: "Archivo", system-ui, sans-serif;
 }
 
 * {
@@ -18,54 +21,116 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font);
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-dim);
 }
 
 .app-header {
-  padding: 20px 24px 0;
+  padding: 24px 24px 0;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, #141b2c, #0f1420);
+  background: linear-gradient(180deg, #0e0f16, var(--bg));
+}
+
+.app-header .eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-mute);
 }
 
 .app-header h1 {
-  margin: 0 0 12px;
-  font-size: 1.5rem;
+  margin: 0 0 16px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
 }
 
 .tabs {
   display: flex;
-  gap: 4px;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
 }
 
 .tab-btn {
   background: transparent;
-  border: none;
-  color: var(--text-dim);
-  padding: 10px 18px;
+  border: 1px solid transparent;
+  color: var(--text-mute);
+  padding: 9px 16px;
   cursor: pointer;
-  font-size: 0.95rem;
-  border-bottom: 3px solid transparent;
-  border-radius: 6px 6px 0 0;
-  transition: color 0.15s, background 0.15s;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 
 .tab-btn:hover {
   color: var(--text);
-  background: var(--panel-light);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .tab-btn.active {
   color: var(--accent);
-  border-bottom-color: var(--accent);
-  font-weight: 600;
+  background: rgba(231, 193, 99, 0.1);
+  border-color: rgba(231, 193, 99, 0.35);
 }
 
 main {
   padding: 20px 24px 40px;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.storage-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 24px;
+  background: rgba(17, 19, 27, 0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-mute);
+}
+
+.storage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.storage-actions button,
+.storage-actions .file-input-label {
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.file-input-label {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: var(--text-mute);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
+
+.file-input-label:hover {
+  color: var(--text);
+  border-color: var(--text-mute);
 }
 
 .tab-panel {
@@ -93,22 +158,27 @@ main {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 18px 20px;
+  padding: 20px 22px;
   margin-bottom: 20px;
 }
 
 .card h2 {
   margin-top: 0;
   font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 
 label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 0.85rem;
-  color: var(--text-dim);
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-mute);
   flex: 1;
 }
 
@@ -121,13 +191,17 @@ input, select {
   background: var(--panel-light);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
   outline: none;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
 }
 
 input:focus, select:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(231, 193, 99, 0.15);
 }
 
 .form-row {
@@ -161,8 +235,11 @@ input:focus, select:focus {
 
 .pick-group h4 {
   margin: 0 0 8px;
-  font-size: 0.9rem;
-  color: var(--accent-2);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-mute);
 }
 
 .pick-row {
@@ -203,7 +280,7 @@ input:focus, select:focus {
 .game-row.skipped {
   opacity: 0.55;
   border-style: dashed;
-  border-color: var(--accent-2);
+  border-color: var(--accent);
 }
 
 .game-note {
@@ -243,34 +320,41 @@ input:focus, select:focus {
 
 button {
   background: var(--accent);
-  color: #0b0f19;
+  color: var(--accent-ink);
   border: none;
-  padding: 9px 16px;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   transition: opacity 0.15s;
 }
 
 button:hover {
-  opacity: 0.85;
+  opacity: 0.88;
 }
 
 button:disabled {
   background: var(--border);
-  color: var(--text-dim);
+  color: var(--text-mute);
   cursor: not-allowed;
 }
 
-button.secondary {
-  background: var(--panel-light);
-  color: var(--text);
+.secondary {
+  background: transparent;
+  color: var(--text-dim);
   border: 1px solid var(--border);
+  border-radius: 999px;
 }
 
-button.danger {
-  background: var(--loss);
-  color: #fff;
+.secondary:hover {
+  color: var(--text);
+  border-color: var(--text-mute);
+}
+
+.danger {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--loss);
+  border: 1px solid rgba(248, 113, 113, 0.35);
 }
 
 .form-error {
@@ -339,26 +423,31 @@ button.danger {
 
 .badge {
   display: inline-block;
-  padding: 1px 8px;
-  border-radius: 10px;
-  font-size: 0.72rem;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   background: var(--panel);
   border: 1px solid var(--border);
-  color: var(--text-dim);
+  color: var(--text-mute);
   margin-left: 6px;
 }
 
 .badge.decider {
-  color: var(--accent-2);
-  border-color: var(--accent-2);
+  color: var(--accent);
+  border-color: rgba(231, 193, 99, 0.4);
 }
 
 .delete-btn {
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-radius: 999px;
   color: var(--loss);
-  padding: 4px 10px;
+  padding: 4px 12px;
   font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .match-card-actions {
@@ -370,9 +459,11 @@ button.danger {
 .edit-btn {
   background: transparent;
   border: 1px solid var(--border);
-  color: var(--text);
-  padding: 4px 10px;
+  border-radius: 999px;
+  color: var(--text-dim);
+  padding: 4px 12px;
   font-size: 0.75rem;
+  font-weight: 600;
 }
 
 table {
@@ -389,11 +480,11 @@ th, td {
 }
 
 th {
-  color: var(--text-dim);
+  color: var(--text-mute);
   font-weight: 600;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.07em;
 }
 
 .match-history-row {
@@ -448,22 +539,25 @@ th {
 .stat-box {
   background: var(--panel-light);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 18px;
+  border-radius: var(--radius);
+  padding: 14px 20px;
   min-width: 110px;
   text-align: center;
 }
 
 .stat-box .value {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--accent);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
 }
 
 .stat-box .label {
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  margin-top: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-mute);
+  margin-top: 6px;
 }
 
 .empty-state {
@@ -513,7 +607,11 @@ th {
 
 .kit-card h3 {
   margin: 0 0 10px;
-  color: var(--accent-2);
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text);
 }
 
 .kit-card .row {
@@ -623,11 +721,11 @@ th {
 }
 
 .bracket-section-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--accent-2);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-mute);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.07em;
   margin-bottom: 10px;
 }
 

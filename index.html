@@ -4,10 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Kit Tournament Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="app-header">
+    <p class="eyebrow">Competitive Match Tracker</p>
     <h1>Kit Tournament Tracker</h1>
     <nav class="tabs">
       <button class="tab-btn active" data-tab="history">Match History</button>
@@ -17,6 +21,23 @@
       <button class="tab-btn" data-tab="bracket">Bracket</button>
     </nav>
   </header>
+
+  <div class="storage-bar">
+    <span id="storage-status-text">Checking data storage&hellip;</span>
+    <div class="storage-actions">
+      <button type="button" id="connect-folder-btn" class="secondary">Connect Data Folder</button>
+      <button type="button" id="export-matches-btn" class="secondary">Export matches.json</button>
+      <button type="button" id="export-bracket-btn" class="secondary">Export bracket.json</button>
+      <label class="file-input-label secondary">
+        Import matches.json
+        <input type="file" id="import-matches-input" accept="application/json" hidden />
+      </label>
+      <label class="file-input-label secondary">
+        Import bracket.json
+        <input type="file" id="import-bracket-input" accept="application/json" hidden />
+      </label>
+    </div>
+  </div>
 
   <main>
     <!-- MATCH HISTORY TAB -->
@@ -187,6 +208,7 @@
     </div>
   </div>
 
+  <script src="storage.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
