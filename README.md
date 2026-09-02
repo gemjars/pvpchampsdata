@@ -1,10 +1,10 @@
 KIT TOURNAMENT TRACKER - SETUP GUIDE
 =====================================
-1. OPEN THE APP
+# 1. OPEN THE APP
 -----------------
 Double-click index.html (or open it from your browser with File > Open).
 
-2. CONNECT THE DATA FOLDER (Chrome or Edge)
+# 2. CONNECT THE DATA FOLDER (Chrome or Edge)
 ----------------------------------------------
 The first time you use the app, click "Connect Data Folder" in the bar
 under the header and choose this project's "data" folder. From then on,
@@ -12,7 +12,7 @@ every match and bracket change is saved directly into:
   data/matches.json
   data/bracket.json
 
-3. USE THE APP
+# 3. USE THE APP
 -----------------
 - Match History tab: enter both player names, choose the format (Best of 3,
   Best of 5, or Grand Final), pick each player's kits, then click "Set Up
