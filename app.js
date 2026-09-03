@@ -1201,6 +1201,11 @@ function renderAll() {
 }
 
 async function init() {
+  if (typeof DataStore === "undefined") {
+    document.getElementById("match-list").innerHTML =
+      `<p class="empty-state">storage.js failed to load (missing file or blocked script). Check that storage.js sits next to index.html.</p>`;
+    return;
+  }
   renderPickSection();
   try {
     matches = await fetchMatches();
