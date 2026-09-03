@@ -1,15 +1,3 @@
-// ---------- Local, no-server storage ----------
-// This app is opened directly as a file (no "npm start" / server needed).
-// Data is read from and written to data/matches.json and data/bracket.json
-// using the browser's File System Access API (Chrome/Edge): the first time
-// you use the app, click "Connect Data Folder" and choose this project's
-// "data" folder. That folder handle is then remembered (via IndexedDB) so
-// you won't be asked again on future visits.
-//
-// Browsers without that API (Firefox, Safari) instead keep data in this
-// browser's local storage. Use the Export/Import buttons to keep that in
-// sync with the data/*.json files, e.g. when moving to another machine.
-
 const FS_SUPPORTED = typeof window.showDirectoryPicker === "function";
 
 const IDB_NAME = "kit-tracker-storage";
