@@ -1,11 +1,93 @@
 // ---------- Constants & State ----------
-const KITS = ["Sword", "UHC", "MSMP", "Cart", "Spear"];
+// All kits that exist anywhere in the app. Used whenever there's no
+// specific event context (e.g. the Comparison tab and match simulation).
+const KITS = ["Sword", "UHC", "DSMP", "Cart", "Spear", "Dia Pot", "Crystal"];
+
+// Champs 1 predates "Dia Pot" and "Crystal", so those two are Champs 2
+// exclusives — every other event (including future ones) gets the full
+// kit list.
+const CHAMPS1_ONLY_KITS = ["Sword", "UHC", "DSMP", "Cart", "Spear"];
+function kitsForEvent(event) {
+  return event === "Champs 1" ? CHAMPS1_ONLY_KITS : KITS;
+}
+
+// Every valid event a match can belong to — shown in the Add Match form's
+// Event select, the Players tab's event filter, and as the Bracket tab's
+// sub-tabs (one bracket per event).
+const EVENTS = ["Champs 1", "Champs 2"];
 
 // Kit values are kept as-is internally (matching stored/legacy data), but
 // some kits are shown under a different name in the UI.
 const KIT_DISPLAY_NAMES = { Spear: "SpearMace" };
 function kitDisplayName(kit) {
   return KIT_DISPLAY_NAMES[kit] || kit;
+}
+
+// Single source of truth for every valid match round: matches may only use
+// one of these round values (enforced by the round <select> in the Add
+// Match form), and each one maps directly to its bracket slots. "section"
+// is which part of the bracket it belongs to (upper/lower/grand final),
+// used to build the on-screen bracket columns in the right order.
+const ROUND_DEFINITIONS = [
+  { value: "1", label: "Round 1", section: "upper", slots: ["WB1-1", "WB1-2", "WB1-3", "WB1-4", "WB1-5", "WB1-6", "WB1-7", "WB1-8"] },
+  { value: "LB1", label: "Lower Round 1", section: "lower", slots: ["LB1-1", "LB1-2", "LB1-3", "LB1-4"] },
+  { value: "2", label: "Round 2", section: "upper", slots: ["WB2-1", "WB2-2", "WB2-3", "WB2-4"] },
+  { value: "LB2", label: "Lower Round 2", section: "lower", slots: ["LB2-1", "LB2-2", "LB2-3", "LB2-4"] },
+  { value: "3", label: "Upper Semi Final", section: "upper", slots: ["WB3-1", "WB3-2"] },
+  { value: "LB3", label: "Lower Round 3", section: "lower", slots: ["LB3-1", "LB3-2"] },
+  { value: "LB4", label: "Lower Round 4", section: "lower", slots: ["LB4-1", "LB4-2"] },
+  { value: "LB5", label: "Lower Round 5", section: "lower", slots: ["LB5"] },
+  { value: "Upper Final", label: "Upper Final", section: "upper", slots: ["WBF"] },
+  { value: "Lower Final", label: "Lower Final", section: "lower", slots: ["LBF"] },
+  { value: "Grand Final", label: "Grand Final", section: "grandFinal", slots: ["GF"] },
+];
+
+const ROUND_LABELS = Object.fromEntries(
+  ROUND_DEFINITIONS.map((r) => [r.value, r.label]),
+);
+function roundLabel(round) {
+  return ROUND_LABELS[round] || String(round);
+}
+
+// Reverse lookup from a bracket slot id (e.g. "WB1-3") back to the round
+// value that slot belongs to — used when clicking an empty bracket slot to
+// pre-fill the Add Match form's round.
+const SLOT_TO_ROUND = {};
+ROUND_DEFINITIONS.forEach((r) => {
+  r.slots.forEach((slotId) => {
+    SLOT_TO_ROUND[slotId] = r.value;
+  });
+});
+
+// Chronological order of the double-elimination bracket's rounds, matching
+// the "round" value stored on each match. Anything not in this list (e.g. a
+// custom/typo'd round name on older data) is sorted after all known rounds.
+const ROUND_ORDER = ROUND_DEFINITIONS.map((r) => r.value);
+
+function roundSortIndex(round) {
+  const normalized = String(round).trim().toLowerCase();
+  const idx = ROUND_ORDER.findIndex((r) => r.toLowerCase() === normalized);
+  return idx === -1 ? ROUND_ORDER.length : idx;
+}
+
+// Orders matches the way they played out: by round (see ROUND_ORDER), then
+// chronologically (oldest first) within a round. Shared by the Match
+// History list and the Comparison tab's head-to-head history.
+function sortMatchesChronologically(matchList) {
+  return [...matchList].sort((a, b) => {
+    const ra = roundSortIndex(a.round);
+    const rb = roundSortIndex(b.round);
+    if (ra !== rb) return ra - rb;
+    if (ra === ROUND_ORDER.length) {
+      // Unrecognized round labels: group together and sort naturally.
+      const cmp = String(a.round).localeCompare(String(b.round), undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
+      if (cmp !== 0) return cmp;
+    }
+    return a.id < b.id ? -1 : 1;
+  });
 }
 
 let matches = [];
@@ -55,6 +137,7 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 });
 
 // ---------- Form Elements ----------
+const eventSelect = document.getElementById("match-event");
 const roundInput = document.getElementById("match-round");
 const formatSelect = document.getElementById("match-format");
 const player1Input = document.getElementById("player1-name");
@@ -68,7 +151,7 @@ const formHeading = document.getElementById("match-form-heading");
 const formError = document.getElementById("form-error");
 const matchForm = document.getElementById("match-form");
 
-[formatSelect, player1Input, player2Input].forEach((el) => {
+[eventSelect, formatSelect, player1Input, player2Input].forEach((el) => {
   el.addEventListener("input", () => {
     resetGamesSection();
     renderPickSection();
@@ -139,12 +222,13 @@ function renderPickSection() {
 }
 
 function buildPickGroup(prefix, playerName, picksEach) {
+  const availableKits = kitsForEvent(eventSelect.value);
   let rows = "";
   for (let i = 0; i < picksEach; i++) {
     rows += `<label>Kit pick ${picksEach > 1 ? i + 1 : ""}
       <select class="pick-kit" data-role="${prefix}" id="${prefix}-pick-${i}">
         <option value="">-- choose --</option>
-        ${KITS.map((k) => `<option value="${k}">${kitDisplayName(k)}</option>`).join("")}
+        ${availableKits.map((k) => `<option value="${k}">${kitDisplayName(k)}</option>`).join("")}
       </select>
     </label>`;
   }
@@ -176,7 +260,9 @@ function updatePickOptions() {
 }
 
 function renderDeciderRow(chosenValues) {
-  const remaining = KITS.filter((k) => !chosenValues.includes(k));
+  const remaining = kitsForEvent(eventSelect.value).filter(
+    (k) => !chosenValues.includes(k),
+  );
   const row = document.getElementById("decider-row");
   if (!row) return;
 
@@ -429,15 +515,17 @@ matchForm.addEventListener("submit", async (e) => {
 
   const round = roundInput.value.trim();
   if (!round) {
-    formError.textContent = "Enter a round.";
+    formError.textContent = "Choose a round.";
     return;
   }
 
   const p1 = player1Input.value.trim();
   const p2 = player2Input.value.trim();
   const format = formatSelect.value;
+  const event = eventSelect.value;
 
   const matchPayload = {
+    event,
     round,
     format,
     player1: p1,
@@ -463,6 +551,7 @@ matchForm.addEventListener("submit", async (e) => {
     resetGamesSection();
     renderPickSection();
     renderAll();
+    document.querySelector('.tab-btn[data-tab="history"]')?.click();
   } catch (err) {
     console.error(err);
     formError.textContent = err.message || "Failed to save match.";
@@ -483,6 +572,7 @@ cancelEditBtn.addEventListener("click", () => {
   matchForm.reset();
   resetGamesSection();
   renderPickSection();
+  document.querySelector('.tab-btn[data-tab="history"]')?.click();
 });
 
 function startEditMatch(id) {
@@ -491,6 +581,7 @@ function startEditMatch(id) {
 
   editingMatchId = id;
 
+  eventSelect.value = match.event || "Champs 1";
   roundInput.value = match.round;
   formatSelect.value = match.format;
   player1Input.value = match.player1;
@@ -546,26 +637,44 @@ function startEditMatch(id) {
   saveMatchBtn.textContent = "Update Match";
   cancelEditBtn.hidden = false;
 
-  document.querySelector('.tab-btn[data-tab="history"]')?.click();
+  document.querySelector('.tab-btn[data-tab="add-match"]')?.click();
   matchForm.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // ---------- Match List ----------
+const historyEventFilter = document.getElementById("history-event-filter");
+
+// Populates the event filter with "All Events" plus every known event.
+// Called once from init() — the event list is static, so this never
+// needs to re-run.
+function renderHistoryEventFilterOptions() {
+  if (!historyEventFilter) return;
+  historyEventFilter.innerHTML =
+    `<option value="all">All Events</option>` +
+    EVENTS.map(
+      (ev) => `<option value="${escapeHtml(ev)}">${escapeHtml(ev)}</option>`,
+    ).join("");
+}
+
+historyEventFilter.addEventListener("change", renderMatchList);
+
 function renderMatchList() {
   const container = document.getElementById("match-list");
-  if (matches.length === 0) {
-    container.innerHTML = `<p class="empty-state">No matches recorded yet.</p>`;
+
+  const eventFilter = historyEventFilter ? historyEventFilter.value : "all";
+  const filteredMatches =
+    eventFilter === "all"
+      ? matches
+      : matches.filter((m) => (m.event || "Champs 1") === eventFilter);
+
+  if (filteredMatches.length === 0) {
+    const eventNote =
+      eventFilter === "all" ? "" : ` for ${escapeHtml(eventFilter)}`;
+    container.innerHTML = `<p class="empty-state">No matches recorded yet${eventNote}.</p>`;
     return;
   }
 
-  const sorted = [...matches].sort((a, b) => {
-    const cmp = String(b.round).localeCompare(String(a.round), undefined, {
-      numeric: true,
-      sensitivity: "base",
-    });
-    if (cmp !== 0) return cmp;
-    return a.id < b.id ? 1 : -1;
-  });
+  const sorted = sortMatchesChronologically(filteredMatches);
 
   container.innerHTML = sorted
     .map((m) => {
@@ -600,7 +709,7 @@ function renderMatchList() {
               <span class="${m.winner === "player2" ? "win" : ""}">${escapeHtml(m.player2)}</span>
               &nbsp;(${p1Wins}-${p2Wins})
             </div>
-            <div class="match-sub">Round ${m.round} • ${formatLabel(m.format)} • Winner: ${escapeHtml(winnerName)}</div>
+            <div class="match-sub">${escapeHtml(m.event || "Champs 1")} • ${escapeHtml(roundLabel(m.round))} • ${formatLabel(m.format)} • Winner: ${escapeHtml(winnerName)}</div>
           </div>
           <div class="match-card-actions">
             <button class="secondary edit-btn" data-edit="${m.id}">Edit</button>
@@ -647,6 +756,23 @@ function renderMatchList() {
 
 // ---------- Players Tab ----------
 const playerSelect = document.getElementById("player-select");
+const playerEventFilter = document.getElementById("player-event-filter");
+
+// Populates the event filter with "All Events" plus every known event
+// (EVENTS, defined later alongside the Bracket tab). Called once from
+// init() — the event list is static, so this never needs to re-run.
+function renderPlayerEventFilterOptions() {
+  if (!playerEventFilter) return;
+  playerEventFilter.innerHTML =
+    `<option value="all">All Events</option>` +
+    EVENTS.map(
+      (ev) => `<option value="${escapeHtml(ev)}">${escapeHtml(ev)}</option>`,
+    ).join("");
+}
+
+playerEventFilter.addEventListener("change", () => {
+  renderPlayerDetails(playerSelect.value);
+});
 
 function getAllPlayerNames() {
   const names = new Set();
@@ -679,6 +805,7 @@ function computePlayerStats(name) {
     else losses++;
 
     m.games.forEach((g) => {
+      if (!kitOverallStats[g.kit]) return; // skip unrecognized/legacy kit values
       kitOverallStats[g.kit].played++;
       if (g.winner === myRole) kitOverallStats[g.kit].won++;
       if (g.pickedBy === myRole) {
@@ -734,20 +861,26 @@ function renderPlayerDetails(name) {
     return;
   }
 
+  const eventFilter = playerEventFilter ? playerEventFilter.value : "all";
   const playerMatches = matches.filter(
-    (m) => m.player1 === name || m.player2 === name,
+    (m) =>
+      (m.player1 === name || m.player2 === name) &&
+      (eventFilter === "all" || (m.event || "Champs 1") === eventFilter),
   );
 
   if (playerMatches.length === 0) {
-    container.innerHTML = `<p class="empty-state">No matches found for this player.</p>`;
+    const eventNote =
+      eventFilter === "all" ? "" : ` in ${escapeHtml(eventFilter)}`;
+    container.innerHTML = `<p class="empty-state">No matches found for this player${eventNote}.</p>`;
     return;
   }
 
   let wins = 0;
   let losses = 0;
+  const kitsInScope = kitsForEvent(eventFilter);
   const kitPickStats = {}; // kit -> { picked: n, won: n } — only games this player personally picked
   const kitOverallStats = {}; // kit -> { played: n, won: n } — every game this player played on that kit
-  KITS.forEach((k) => {
+  kitsInScope.forEach((k) => {
     kitPickStats[k] = { picked: 0, won: 0 };
     kitOverallStats[k] = { played: 0, won: 0 };
   });
@@ -764,6 +897,7 @@ function renderPlayerDetails(name) {
       const oppKitWins = m.games.length - myKitWins;
 
       m.games.forEach((g) => {
+        if (!kitOverallStats[g.kit]) return; // skip unrecognized/legacy kit values
         kitOverallStats[g.kit].played++;
         if (g.winner === myRole) kitOverallStats[g.kit].won++;
 
@@ -794,14 +928,15 @@ function renderPlayerDetails(name) {
         .join("");
 
       return `<tr class="match-history-row" data-history-id="${m.id}">
-        <td>${m.round}</td>
+        ${eventFilter === "all" ? `<td>${escapeHtml(m.event || "Champs 1")}</td>` : ""}
+        <td>${escapeHtml(roundLabel(m.round))}</td>
         <td>${escapeHtml(opponent)}</td>
         <td>${formatShortLabel(m.format)}</td>
         <td><span class="result-pill ${won ? "win" : "loss"}">${won ? "WIN" : "LOSS"}</span></td>
         <td>${myKitWins} - ${oppKitWins}</td>
       </tr>
       <tr class="match-history-detail" data-detail-for="${m.id}">
-        <td colspan="5">${gameLines}</td>
+        <td colspan="${eventFilter === "all" ? 6 : 5}">${gameLines}</td>
       </tr>`;
     })
     .join("");
@@ -810,7 +945,7 @@ function renderPlayerDetails(name) {
     ? Math.round((wins / playerMatches.length) * 100)
     : 0;
 
-  const kitRows = KITS.map((k) => {
+  const kitRows = kitsInScope.map((k) => {
     const stat = kitPickStats[k];
     const rate = stat.picked ? Math.round((stat.won / stat.picked) * 100) : 0;
     return `<tr>
@@ -821,7 +956,7 @@ function renderPlayerDetails(name) {
     </tr>`;
   }).join("");
 
-  const kitOverallRows = KITS.map((k) => {
+  const kitOverallRows = kitsInScope.map((k) => {
     const stat = kitOverallStats[k];
     const rate = stat.played ? Math.round((stat.won / stat.played) * 100) : 0;
     return `<tr>
@@ -854,7 +989,7 @@ function renderPlayerDetails(name) {
 
     <h3>Match History</h3>
     <table>
-      <thead><tr><th>Round</th><th>Opponent</th><th>Format</th><th>Result</th><th>Kit Score</th></tr></thead>
+      <thead><tr>${eventFilter === "all" ? "<th>Event</th>" : ""}<th>Round</th><th>Opponent</th><th>Format</th><th>Result</th><th>Kit Score</th></tr></thead>
       <tbody>${matchRows}</tbody>
     </table>
   `;
@@ -871,16 +1006,41 @@ function renderPlayerDetails(name) {
 }
 
 // ---------- Kits Tab ----------
+const kitEventFilter = document.getElementById("kit-event-filter");
+
+// Populates the event filter with "All Events" plus every known event.
+// Called once from init() — the event list is static, so this never
+// needs to re-run.
+function renderKitEventFilterOptions() {
+  if (!kitEventFilter) return;
+  kitEventFilter.innerHTML =
+    `<option value="all">All Events</option>` +
+    EVENTS.map(
+      (ev) => `<option value="${escapeHtml(ev)}">${escapeHtml(ev)}</option>`,
+    ).join("");
+}
+
+kitEventFilter.addEventListener("change", renderKitStats);
+
 function renderKitStats() {
   const container = document.getElementById("kit-stats");
 
-  if (matches.length === 0) {
-    container.innerHTML = `<p class="empty-state">No matches recorded yet.</p>`;
+  const eventFilter = kitEventFilter ? kitEventFilter.value : "all";
+  const filteredMatches =
+    eventFilter === "all"
+      ? matches
+      : matches.filter((m) => (m.event || "Champs 1") === eventFilter);
+
+  if (filteredMatches.length === 0) {
+    const eventNote =
+      eventFilter === "all" ? "" : ` for ${escapeHtml(eventFilter)}`;
+    container.innerHTML = `<p class="empty-state">No matches recorded yet${eventNote}.</p>`;
     return;
   }
 
+  const kitsInScope = kitsForEvent(eventFilter);
   const stats = {};
-  KITS.forEach(
+  kitsInScope.forEach(
     (k) =>
       (stats[k] = {
         totalGames: 0,
@@ -891,9 +1051,10 @@ function renderKitStats() {
       }),
   );
 
-  matches.forEach((m) => {
+  filteredMatches.forEach((m) => {
     m.games.forEach((g) => {
       const s = stats[g.kit];
+      if (!s) return; // skip unrecognized/legacy kit values
       s.totalGames++;
       if (g.pickedBy === "decider") {
         s.deciderCount++;
@@ -908,7 +1069,7 @@ function renderKitStats() {
 
   container.innerHTML =
     `<div class="kit-grid">` +
-    KITS.map((k) => {
+    kitsInScope.map((k) => {
       const s = stats[k];
       const pickerWinRate = s.pickerGames
         ? Math.round((s.pickerWins / s.pickerGames) * 100)
@@ -997,6 +1158,95 @@ function statBlockHtml(stats) {
   `;
 }
 
+// Builds the head-to-head record + match history between two players,
+// shown first on the Comparison tab. Returns a friendly empty state if
+// they've never played each other.
+// Finds every match directly between two players, in chronological order,
+// along with each one's win count. Shared by the head-to-head display and
+// the match simulation (which factors this record into its prediction).
+function computeHeadToHead(nameA, nameB) {
+  const headToHeadMatches = matches.filter(
+    (m) =>
+      (m.player1 === nameA && m.player2 === nameB) ||
+      (m.player1 === nameB && m.player2 === nameA),
+  );
+  const sorted = sortMatchesChronologically(headToHeadMatches);
+
+  let winsA = 0;
+  let winsB = 0;
+  sorted.forEach((m) => {
+    const winnerName = m.winner === "player1" ? m.player1 : m.player2;
+    winnerName === nameA ? winsA++ : winsB++;
+  });
+
+  return { matches: sorted, winsA, winsB };
+}
+
+function headToHeadHtml(nameA, nameB) {
+  const { matches: sorted, winsA, winsB } = computeHeadToHead(nameA, nameB);
+
+  if (sorted.length === 0) {
+    return `<div class="head-to-head">
+      <h3>Head-to-Head</h3>
+      <p class="empty-state">${escapeHtml(nameA)} and ${escapeHtml(nameB)} haven't played each other yet.</p>
+    </div>`;
+  }
+
+  const rows = sorted
+    .map((m) => {
+      const isAP1 = m.player1 === nameA;
+      const myRole = isAP1 ? "player1" : "player2";
+      const winnerName = m.winner === "player1" ? m.player1 : m.player2;
+
+      const aKitWins = m.games.filter((g) => g.winner === myRole).length;
+      const bKitWins = m.games.length - aKitWins;
+
+      const gameLines = m.games
+        .map((g) => {
+          const pickerLabel =
+            g.pickedBy === "decider"
+              ? "Decider"
+              : g.pickedBy === myRole
+                ? nameA
+                : nameB;
+          const badgeClass =
+            g.pickedBy === "decider" ? "badge decider" : "badge";
+          const gameWinnerName =
+            g.winner === "player1" ? m.player1 : m.player2;
+          return `<div class="game-line">
+            <span>${kitDisplayName(g.kit)} <span class="${badgeClass}">${escapeHtml(pickerLabel)}</span></span>
+            <span>${g.score1} - ${g.score2} <strong>(${escapeHtml(gameWinnerName)})</strong></span>
+          </div>`;
+        })
+        .join("");
+
+      return `<tr class="match-history-row" data-history-id="${m.id}">
+        <td>${escapeHtml(m.event || "Champs 1")}</td>
+        <td>${escapeHtml(roundLabel(m.round))}</td>
+        <td>${formatShortLabel(m.format)}</td>
+        <td><strong class="${winnerName === nameA ? "win" : ""}">${escapeHtml(winnerName)}</strong></td>
+        <td>${aKitWins} - ${bKitWins}</td>
+      </tr>
+      <tr class="match-history-detail" data-detail-for="${m.id}">
+        <td colspan="5">${gameLines}</td>
+      </tr>`;
+    })
+    .join("");
+
+  return `<div class="head-to-head">
+    <h3>Head-to-Head</h3>
+    <div class="stat-cards">
+      <div class="stat-box"><div class="value">${sorted.length}</div><div class="label">Matches</div></div>
+      <div class="stat-box"><div class="value">${winsA}</div><div class="label">${escapeHtml(nameA)} Wins</div></div>
+      <div class="stat-box"><div class="value">${winsB}</div><div class="label">${escapeHtml(nameB)} Wins</div></div>
+    </div>
+    <table>
+      <thead><tr><th>Event</th><th>Round</th><th>Format</th><th>Winner</th><th>Kit Score</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
 function renderComparisonStats() {
   const container = document.getElementById("comparison-stats");
   const nameA = comparePlayer1Select.value;
@@ -1015,6 +1265,7 @@ function renderComparisonStats() {
   const statsB = computePlayerStats(nameB);
 
   container.innerHTML = `
+    ${headToHeadHtml(nameA, nameB)}
     <div class="comparison-columns">
       <div>
         <h3>${escapeHtml(nameA)}</h3>
@@ -1026,6 +1277,89 @@ function renderComparisonStats() {
       </div>
     </div>
   `;
+
+  container.querySelectorAll(".match-history-row").forEach((row) => {
+    row.addEventListener("click", () => {
+      const id = row.dataset.historyId;
+      const detail = container.querySelector(
+        `.match-history-detail[data-detail-for="${id}"]`,
+      );
+      if (detail) detail.classList.toggle("open");
+    });
+  });
+}
+
+// Weights a round by how far into the bracket it is — Round 1 counts
+// least, Grand Final counts most — so later-round results carry more
+// signal for how reliable a player is "when it matters".
+function roundStageWeight(round) {
+  return 1 + roundSortIndex(round);
+}
+
+// A player's win rate across all their matches, weighted so wins (and
+// losses) in later rounds count more heavily. Used as a proxy for how
+// reliable a player is in high-stakes, later-round games.
+function clutchScore(name) {
+  const playerMatches = matches.filter(
+    (m) => m.player1 === name || m.player2 === name,
+  );
+  let weightedWins = 0;
+  let weightedTotal = 0;
+  playerMatches.forEach((m) => {
+    const myRole = m.player1 === name ? "player1" : "player2";
+    const weight = roundStageWeight(m.round);
+    weightedTotal += weight;
+    if (m.winner === myRole) weightedWins += weight;
+  });
+  return smoothedRate(weightedWins, weightedTotal, 3);
+}
+
+// Predicts which kit a player is most likely to ban, before any picks are
+// made: either their own worst-performing kit (to avoid being forced onto
+// it later) or whichever remaining kit their opponent performs best on (to
+// deny them their strongest option) — whichever represents the bigger
+// swing away from a 50/50 kit, based on each player's win rates.
+function predictBan(myStats, oppStats, bannedSet) {
+  const candidates = KITS.filter((k) => !bannedSet.has(k));
+  if (candidates.length === 0) return null;
+
+  let oppBestKit = candidates[0];
+  let oppBestRate = -Infinity;
+  let myWorstKit = candidates[0];
+  let myWorstRate = Infinity;
+
+  candidates.forEach((k) => {
+    const oppRate = smoothedRate(
+      oppStats.kitOverallStats[k].won,
+      oppStats.kitOverallStats[k].played,
+      2,
+    );
+    if (oppRate > oppBestRate) {
+      oppBestRate = oppRate;
+      oppBestKit = k;
+    }
+    const myRate = smoothedRate(
+      myStats.kitOverallStats[k].won,
+      myStats.kitOverallStats[k].played,
+      2,
+    );
+    if (myRate < myWorstRate) {
+      myWorstRate = myRate;
+      myWorstKit = k;
+    }
+  });
+
+  const oppThreat = oppBestRate - 0.5; // how dangerous the opponent's best kit is
+  const ownWeakness = 0.5 - myWorstRate; // how costly this player's worst kit is
+
+  if (oppThreat >= ownWeakness) {
+    return {
+      kit: oppBestKit,
+      reason: "opponent's strongest kit",
+      rate: oppBestRate,
+    };
+  }
+  return { kit: myWorstKit, reason: "their own weakest kit", rate: myWorstRate };
 }
 
 // Ranks a player's kits from most to least likely to be picked, based on
@@ -1097,7 +1431,16 @@ function simulateMatch(nameA, nameB, format) {
   const statsB = computePlayerStats(nameB);
   const picks = picksForFormat(format);
 
-  const excludeSet = new Set();
+  // ---- Ban phase: each player bans one kit before any picks are made.
+  // nameA bans first, then nameB bans from whatever's left. ----
+  const bannedSet = new Set();
+  const banA = predictBan(statsA, statsB, bannedSet);
+  if (banA) bannedSet.add(banA.kit);
+  const banB = predictBan(statsB, statsA, bannedSet);
+  if (banB) bannedSet.add(banB.kit);
+
+  // ---- Pick phase: picks are made from whatever survived the bans. ----
+  const excludeSet = new Set(bannedSet);
   const picksA = predictPicks(statsA, picks.p1, excludeSet);
   picksA.forEach((k) => excludeSet.add(k));
   const picksB = predictPicks(statsB, picks.p2, excludeSet);
@@ -1108,24 +1451,91 @@ function simulateMatch(nameA, nameB, format) {
 
   const games = buildPlayOrder(format, picksA, picksB, decider);
 
+  // "Big game" reliability: each player's win rate weighted toward
+  // later-round results, compared head-to-head against each other.
+  const clutchA = clutchScore(nameA);
+  const clutchB = clutchScore(nameB);
+  const clutchProbA = clutchA / (clutchA + clutchB);
+
   const gameResults = games.map((g) => {
     const oA = statsA.kitOverallStats[g.kit];
     const oB = statsB.kitOverallStats[g.kit];
     const rA = smoothedRate(oA.won, oA.played, 2);
     const rB = smoothedRate(oB.won, oB.played, 2);
-    const pA = rA / (rA + rB);
+    let pA = rA / (rA + rB);
+    if (g.pickedBy === "decider") {
+      // The decider is the match-defining "big game" — nudge its odds
+      // toward whichever player has historically been more reliable in
+      // later bracket rounds, on top of their raw kit win rate.
+      pA = (pA * 2 + clutchProbA) / 3;
+    }
     return { kit: g.kit, pickedBy: g.pickedBy, pA };
   });
 
-  const probAWins = majorityWinProbability(gameResults.map((g) => g.pA));
+  const kitBasedProbA = majorityWinProbability(gameResults.map((g) => g.pA));
+
+  // Blend in head-to-head history between these two players, if any —
+  // weighted by how many times they've actually played (more meetings,
+  // more trust in that record).
+  const headToHead = computeHeadToHead(nameA, nameB);
+  const h2hTotal = headToHead.matches.length;
+  const h2hProbA = h2hTotal
+    ? smoothedRate(headToHead.winsA, h2hTotal, 1)
+    : null;
+  const h2hWeight = Math.min(h2hTotal, 5);
+
+  const kitWeight = 4;
+  let weightedProb = kitBasedProbA * kitWeight;
+  let weightSum = kitWeight;
+  if (h2hProbA !== null) {
+    weightedProb += h2hProbA * h2hWeight;
+    weightSum += h2hWeight;
+  }
+  const probAWins = weightedProb / weightSum;
+
   const winnerName = probAWins >= 0.5 ? nameA : nameB;
   const confidence = Math.round(Math.max(probAWins, 1 - probAWins) * 100);
 
-  return { statsA, statsB, nameA, nameB, gameResults, winnerName, confidence };
+  return {
+    statsA,
+    statsB,
+    nameA,
+    nameB,
+    banA,
+    banB,
+    gameResults,
+    winnerName,
+    confidence,
+    headToHead,
+    clutchA,
+    clutchB,
+  };
 }
 
 function simulateResultHtml(result) {
-  const { nameA, nameB, gameResults, winnerName, confidence } = result;
+  const {
+    nameA,
+    nameB,
+    gameResults,
+    winnerName,
+    confidence,
+    banA,
+    banB,
+    headToHead,
+  } = result;
+
+  const banLines = [
+    { name: nameA, ban: banA },
+    { name: nameB, ban: banB },
+  ]
+    .filter((entry) => entry.ban)
+    .map(
+      ({ name, ban }) => `<div class="game-line">
+        <span>${escapeHtml(name)} bans <strong>${kitDisplayName(ban.kit)}</strong></span>
+        <span class="hint">likely picking ${escapeHtml(ban.reason)}</span>
+      </div>`,
+    )
+    .join("");
 
   const gameLines = gameResults
     .map((g) => {
@@ -1145,17 +1555,24 @@ function simulateResultHtml(result) {
     })
     .join("");
 
+  const h2hNote = headToHead.matches.length
+    ? `${escapeHtml(nameA)} ${headToHead.winsA} - ${headToHead.winsB} ${escapeHtml(nameB)} head-to-head across ${headToHead.matches.length} previous meeting${headToHead.matches.length === 1 ? "" : "s"} was factored into this prediction.`
+    : `${escapeHtml(nameA)} and ${escapeHtml(nameB)} haven't played each other before, so this prediction is based on general form only.`;
+
   return `
     <div class="stat-cards">
       <div class="stat-box"><div class="value">${escapeHtml(winnerName)}</div><div class="label">Predicted Winner</div></div>
       <div class="stat-box"><div class="value">${confidence}%</div><div class="label">AI Confidence</div></div>
     </div>
+    <h4>Predicted Bans</h4>
+    ${banLines || `<p class="hint">No bans predicted.</p>`}
     <h4>Predicted Kits &amp; Per-Kit Odds</h4>
     ${gameLines}
     <p class="hint">
       Based on each player's historical pick tendencies and win rates per
-      kit, with smoothing applied for kits/players with limited data. This is
-      a heuristic estimate, not a guarantee.
+      kit (after the predicted bans), each player's reliability in later
+      bracket rounds for the decider game, and head-to-head history between
+      them. ${h2hNote} This is a heuristic estimate, not a guarantee.
     </p>
   `;
 }
@@ -1207,6 +1624,9 @@ async function init() {
     return;
   }
   renderPickSection();
+  renderHistoryEventFilterOptions();
+  renderPlayerEventFilterOptions();
+  renderKitEventFilterOptions();
   try {
     matches = await fetchMatches();
   } catch (err) {
@@ -1214,76 +1634,59 @@ async function init() {
     document.getElementById("match-list").innerHTML =
       `<p class="empty-state">Could not load match data. See the browser console for details.</p>`;
   }
-  try {
-    bracketAssignments = await fetchBracketAssignments();
-  } catch (err) {
-    console.error(err);
-  }
   await refreshStorageStatus();
   renderAll();
 }
 
 init();
 
-// ---------- Storage Bar (data folder connection status) ----------
+// ---------- Storage Bar (matches.json connection status) ----------
 const storageStatusText = document.getElementById("storage-status-text");
-const connectFolderBtn = document.getElementById("connect-folder-btn");
+const connectFileBtn = document.getElementById("connect-file-btn");
 const exportMatchesBtn = document.getElementById("export-matches-btn");
-const exportBracketBtn = document.getElementById("export-bracket-btn");
 const importMatchesInput = document.getElementById("import-matches-input");
-const importBracketInput = document.getElementById("import-bracket-input");
 
 async function refreshStorageStatus() {
   const connected = await DataStore.isConnected();
   if (connected) {
     storageStatusText.textContent =
-      "Connected — saving directly to data/matches.json and data/bracket.json.";
-    connectFolderBtn.textContent = "Change Data Folder";
-    connectFolderBtn.hidden = false;
+      "Connected — saving directly to matches.json.";
+    connectFileBtn.textContent = "Change matches.json";
+    connectFileBtn.hidden = false;
   } else if (DataStore.isFileSystemSupported) {
     storageStatusText.textContent =
-      "Not connected — using this browser's local storage until you connect the data folder.";
-    connectFolderBtn.textContent = "Connect Data Folder";
-    connectFolderBtn.hidden = false;
+      "Not connected — using this browser's local storage until you connect matches.json.";
+    connectFileBtn.textContent = "Connect matches.json";
+    connectFileBtn.hidden = false;
   } else {
     storageStatusText.textContent =
-      "This browser can't save directly to files — using local storage. Use Export/Import to sync with data/*.json.";
-    connectFolderBtn.hidden = true;
+      "This browser can't save directly to files — using local storage. Use Export/Import to sync with matches.json.";
+    connectFileBtn.hidden = true;
   }
 }
 
-connectFolderBtn.addEventListener("click", async () => {
+connectFileBtn.addEventListener("click", async () => {
   try {
-    await DataStore.chooseDirectoryHandle();
-    await migrateLocalDataIntoFolderIfNeeded();
+    await DataStore.chooseMatchesFile();
+    await migrateLocalDataIntoFileIfNeeded();
     matches = await fetchMatches();
-    bracketAssignments = await fetchBracketAssignments();
     await refreshStorageStatus();
     renderAll();
   } catch (err) {
     console.error(err);
     if (err.name !== "AbortError") {
-      alert(err.message || "Failed to connect the data folder.");
+      alert(err.message || "Failed to connect matches.json.");
     }
   }
 });
 
-// If the newly-connected folder's files are empty but this browser already
-// holds data saved locally (from before a folder was connected), copy it
-// over once so nothing is lost.
-async function migrateLocalDataIntoFolderIfNeeded() {
-  const [folderMatches, folderBracket] = await Promise.all([
-    DataStore.loadMatches(),
-    DataStore.loadBracket(),
-  ]);
-  if (folderMatches.length === 0 && matches.length > 0) {
+// If the newly-connected file is empty but this browser already holds
+// matches saved locally (from before a file was connected), copy it over
+// once so nothing is lost.
+async function migrateLocalDataIntoFileIfNeeded() {
+  const fileMatches = await DataStore.loadMatches();
+  if (fileMatches.length === 0 && matches.length > 0) {
     await DataStore.saveMatches(matches);
-  }
-  if (
-    Object.keys(folderBracket).length === 0 &&
-    Object.keys(bracketAssignments).length > 0
-  ) {
-    await DataStore.saveBracket(bracketAssignments);
   }
 }
 
@@ -1301,10 +1704,6 @@ function downloadJson(filename, data) {
 
 exportMatchesBtn.addEventListener("click", () => {
   downloadJson("matches.json", matches);
-});
-
-exportBracketBtn.addEventListener("click", () => {
-  downloadJson("bracket.json", bracketAssignments);
 });
 
 importMatchesInput.addEventListener("change", async () => {
@@ -1332,71 +1731,34 @@ importMatchesInput.addEventListener("change", async () => {
   }
 });
 
-importBracketInput.addEventListener("change", async () => {
-  const file = importBracketInput.files[0];
-  importBracketInput.value = "";
-  if (!file) return;
-  try {
-    const parsed = JSON.parse(await file.text());
-    if (
-      typeof parsed !== "object" ||
-      Array.isArray(parsed) ||
-      parsed === null
-    ) {
-      throw new Error("That file is not a bracket.json object.");
-    }
-    bracketAssignments = parsed;
-    await DataStore.saveBracket(bracketAssignments);
-    renderAll();
-  } catch (err) {
-    console.error(err);
-    alert(err.message || "Failed to import bracket.json.");
-  }
-});
-
 // ---------- Bracket Tab ----------
-// A standard 16-player double-elimination bracket layout (30 slots total).
-// Assignment of a recorded match to a slot is manual — this data structure
-// only defines the shape of the bracket and which slots connect to which,
-// for drawing connector lines.
-const BRACKET_SECTIONS = {
-  upper: {
-    containerId: "bracket-upper-rounds",
-    rounds: [
-      {
-        label: "Round 1",
-        slots: [
-          "WB1-1",
-          "WB1-2",
-          "WB1-3",
-          "WB1-4",
-          "WB1-5",
-          "WB1-6",
-          "WB1-7",
-          "WB1-8",
-        ],
-      },
-      { label: "Round 2", slots: ["WB2-1", "WB2-2", "WB2-3", "WB2-4"] },
-      { label: "Semifinal", slots: ["WB3-1", "WB3-2"] },
-      { label: "Upper Final", slots: ["WBF"] },
-    ],
-  },
-  lower: {
-    containerId: "bracket-lower-rounds",
-    rounds: [
-      { label: "Round 1", slots: ["LB1-1", "LB1-2", "LB1-3", "LB1-4"] },
-      { label: "Round 2", slots: ["LB2-1", "LB2-2", "LB2-3", "LB2-4"] },
-      { label: "Round 3", slots: ["LB3-1", "LB3-2"] },
-      { label: "Round 4", slots: ["LB4-1", "LB4-2"] },
-      { label: "Semifinal", slots: ["LB5"] },
-      { label: "Lower Final", slots: ["LBF"] },
-    ],
-  },
-  grandFinal: {
-    containerId: "bracket-gf-rounds",
-    rounds: [{ label: "Grand Final", slots: ["GF"] }],
-  },
+// A standard 16-player double-elimination bracket layout (30 slots total)
+// per event. There's one bracket per event — switch between them with the
+// sub-tabs rendered into #bracket-event-tabs. The columns and slot shape
+// are derived from ROUND_DEFINITIONS above (single source of truth shared
+// with the round <select> in the Add Match form) — match assignment is
+// computed automatically (see computeBracketAssignments below). EVENTS
+// itself is declared at the top of the file alongside the other shared
+// constants.
+
+const BRACKET_SECTION_CONTAINERS = {
+  upper: "bracket-upper-rounds",
+  lower: "bracket-lower-rounds",
+  grandFinal: "bracket-gf-rounds",
 };
+
+function buildBracketSections() {
+  const sections = {};
+  Object.entries(BRACKET_SECTION_CONTAINERS).forEach(([key, containerId]) => {
+    sections[key] = { containerId, rounds: [] };
+  });
+  ROUND_DEFINITIONS.forEach((def) => {
+    sections[def.section].rounds.push({ label: def.label, slots: def.slots });
+  });
+  return sections;
+}
+
+const BRACKET_SECTIONS = buildBracketSections();
 
 // [parentSlotIds[], childSlotId] pairs used only to draw connector lines.
 const BRACKET_CONNECTIONS = [
@@ -1425,15 +1787,40 @@ const BRACKET_CONNECTIONS = [
 const BRACKET_MATCH_H = 62;
 const BRACKET_GAP = 14;
 
-let bracketAssignments = {}; // slotId -> matchId
+// Maps a match's "round" value to the ordered list of bracket slots it can
+// fill. Matches sharing a round are placed chronologically (oldest first)
+// into that round's slots, e.g. the first "1" (Round 1) match recorded
+// goes to WB1-1, the second to WB1-2, and so on. Every valid round value
+// (see ROUND_DEFINITIONS) maps to a slot group — the round <select> only
+// offers these values, so matches always have a home on the bracket.
+const ROUND_TO_SLOTS = Object.fromEntries(
+  ROUND_DEFINITIONS.map((r) => [r.value, r.slots]),
+);
 
-async function fetchBracketAssignments() {
-  return DataStore.loadBracket();
-}
+let activeBracketEvent = EVENTS[0];
 
-async function saveBracketAssignments() {
-  await DataStore.saveBracket(bracketAssignments);
-  return bracketAssignments;
+// Builds the slotId -> matchId map for one event by grouping that event's
+// matches by round, ordering each group chronologically (by id), and
+// filling the round's slots in that order. No separate bracket data file
+// is needed — this is recomputed from `matches` every render.
+function computeBracketAssignments(event) {
+  const byRound = {};
+  matches
+    .filter((m) => (m.event || "Champs 1") === event)
+    .forEach((m) => {
+      (byRound[m.round] = byRound[m.round] || []).push(m);
+    });
+
+  const assignments = {};
+  Object.entries(byRound).forEach(([round, roundMatches]) => {
+    const slots = ROUND_TO_SLOTS[round];
+    if (!slots) return;
+    const ordered = [...roundMatches].sort((a, b) => (a.id < b.id ? -1 : 1));
+    ordered.slice(0, slots.length).forEach((m, idx) => {
+      assignments[slots[idx]] = m.id;
+    });
+  });
+  return assignments;
 }
 
 function bracketSectionHeight(rounds) {
@@ -1447,12 +1834,12 @@ function matchScoreSummary(match) {
   return { p1Wins, p2Wins };
 }
 
-function renderBracketMatchCard(slotId) {
-  const matchId = bracketAssignments[slotId];
+function renderBracketMatchCard(slotId, assignments) {
+  const matchId = assignments[slotId];
   const match = matchId ? matches.find((m) => m.id === matchId) : null;
 
   if (!match) {
-    return `<div class="bracket-match empty" data-slot="${slotId}">+ Assign match</div>`;
+    return `<div class="bracket-match empty" data-slot="${slotId}">+ Add match</div>`;
   }
 
   const { p1Wins, p2Wins } = matchScoreSummary(match);
@@ -1469,13 +1856,12 @@ function renderBracketMatchCard(slotId) {
       </div>
     </div>
     <div class="bracket-match-meta">
-      <span>Rd ${escapeHtml(String(match.round))} • ${formatShortLabel(match.format)}</span>
-      <button type="button" class="bracket-match-change" data-slot="${slotId}">Change</button>
+      <span>${escapeHtml(roundLabel(match.round))} • ${formatShortLabel(match.format)}</span>
     </div>
   </div>`;
 }
 
-function renderBracketSection(section) {
+function renderBracketSection(section, assignments) {
   const container = document.getElementById(section.containerId);
   if (!container) return;
   const height = bracketSectionHeight(section.rounds);
@@ -1483,7 +1869,7 @@ function renderBracketSection(section) {
   container.innerHTML = section.rounds
     .map((round) => {
       const matchesHtml = round.slots
-        .map((slotId) => renderBracketMatchCard(slotId))
+        .map((slotId) => renderBracketMatchCard(slotId, assignments))
         .join("");
       return `<div class="bracket-round-col">
         <div class="bracket-round-label">${escapeHtml(round.label)}</div>
@@ -1493,31 +1879,63 @@ function renderBracketSection(section) {
     .join("");
 }
 
+function renderBracketEventTabs() {
+  const container = document.getElementById("bracket-event-tabs");
+  if (!container) return;
+  container.innerHTML = EVENTS.map(
+    (ev) =>
+      `<button type="button" class="bracket-event-tab${ev === activeBracketEvent ? " active" : ""}" data-event="${escapeHtml(ev)}">${escapeHtml(ev)}</button>`,
+  ).join("");
+
+  container.querySelectorAll(".bracket-event-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.event === activeBracketEvent) return;
+      activeBracketEvent = btn.dataset.event;
+      renderBracket();
+    });
+  });
+}
+
 function renderBracket() {
-  Object.values(BRACKET_SECTIONS).forEach(renderBracketSection);
+  renderBracketEventTabs();
+  const assignments = computeBracketAssignments(activeBracketEvent);
+  Object.values(BRACKET_SECTIONS).forEach((section) =>
+    renderBracketSection(section, assignments),
+  );
   attachBracketMatchListeners();
   requestAnimationFrame(drawBracketLines);
 }
 
 function attachBracketMatchListeners() {
-  document.querySelectorAll(".bracket-match").forEach((card) => {
-    card.addEventListener("click", (e) => {
-      if (e.target.closest(".bracket-match-change")) return;
-      const slotId = card.dataset.slot;
-      if (card.dataset.match) {
-        openBracketDetailModal(card.dataset.match);
-      } else {
-        openBracketPickerModal(slotId);
-      }
+  document.querySelectorAll(".bracket-match[data-match]").forEach((card) => {
+    card.addEventListener("click", () => {
+      openBracketDetailModal(card.dataset.match);
     });
   });
 
-  document.querySelectorAll(".bracket-match-change").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openBracketPickerModal(btn.dataset.slot);
+  document.querySelectorAll(".bracket-match.empty").forEach((card) => {
+    card.addEventListener("click", () => {
+      startAddMatchFromSlot(card.dataset.slot);
     });
   });
+}
+
+// Opens the Add Match form pre-filled with the event (whichever bracket
+// tab is active) and round (derived from the clicked slot) so the new
+// match lands in this exact slot once saved.
+function startAddMatchFromSlot(slotId) {
+  const round = SLOT_TO_ROUND[slotId];
+  if (!round) return;
+
+  exitEditMode();
+  matchForm.reset();
+  resetGamesSection();
+  eventSelect.value = activeBracketEvent;
+  roundInput.value = round;
+  renderPickSection();
+
+  document.querySelector('.tab-btn[data-tab="add-match"]')?.click();
+  matchForm.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // ---------- Bracket connector lines ----------
@@ -1618,39 +2036,25 @@ if (bracketScroll) {
   window.addEventListener("blur", stopBracketPan);
 }
 
-// ---------- Bracket modals ----------
+// ---------- Bracket modal ----------
 const bracketDetailModal = document.getElementById("bracket-detail-modal");
 const bracketDetailContent = document.getElementById("bracket-detail-content");
 const bracketDetailClose = document.getElementById("bracket-detail-close");
-
-const bracketPickerModal = document.getElementById("bracket-picker-modal");
-const bracketPickerHeading = document.getElementById("bracket-picker-heading");
-const bracketPickerSearch = document.getElementById("bracket-picker-search");
-const bracketPickerList = document.getElementById("bracket-picker-list");
-const bracketPickerClose = document.getElementById("bracket-picker-close");
-
-let activePickerSlot = null;
 
 function closeModal(overlay) {
   overlay.hidden = true;
 }
 
-[bracketDetailModal, bracketPickerModal].forEach((overlay) => {
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) closeModal(overlay);
-  });
+bracketDetailModal.addEventListener("click", (e) => {
+  if (e.target === bracketDetailModal) closeModal(bracketDetailModal);
 });
 bracketDetailClose.addEventListener("click", () =>
   closeModal(bracketDetailModal),
-);
-bracketPickerClose.addEventListener("click", () =>
-  closeModal(bracketPickerModal),
 );
 
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   if (!bracketDetailModal.hidden) closeModal(bracketDetailModal);
-  if (!bracketPickerModal.hidden) closeModal(bracketPickerModal);
 });
 
 function openBracketDetailModal(matchId) {
@@ -1680,7 +2084,7 @@ function openBracketDetailModal(matchId) {
 
   bracketDetailContent.innerHTML = `
     <h3>${escapeHtml(match.player1)} vs ${escapeHtml(match.player2)}</h3>
-    <p class="match-sub">Round ${escapeHtml(String(match.round))} • ${formatLabel(match.format)} • Winner: ${escapeHtml(winnerName)}</p>
+    <p class="match-sub">${escapeHtml(match.event || "Champs 1")} • ${escapeHtml(roundLabel(match.round))} • ${formatLabel(match.format)} • Winner: ${escapeHtml(winnerName)}</p>
     <div class="stat-cards">
       <div class="stat-box"><div class="value">${p1Wins} - ${p2Wins}</div><div class="label">Kit Score</div></div>
     </div>
@@ -1688,110 +2092,3 @@ function openBracketDetailModal(matchId) {
   `;
   bracketDetailModal.hidden = false;
 }
-
-function openBracketPickerModal(slotId) {
-  activePickerSlot = slotId;
-  bracketPickerHeading.textContent = `Assign a match to slot ${slotId}`;
-  bracketPickerSearch.value = "";
-  renderBracketPickerList("");
-  bracketPickerModal.hidden = false;
-  bracketPickerSearch.focus();
-}
-
-function renderBracketPickerList(query) {
-  const q = query.trim().toLowerCase();
-  const sorted = [...matches].sort((a, b) => {
-    const cmp = String(b.round).localeCompare(String(a.round), undefined, {
-      numeric: true,
-      sensitivity: "base",
-    });
-    if (cmp !== 0) return cmp;
-    return a.id < b.id ? 1 : -1;
-  });
-
-  const filtered = sorted.filter((m) => {
-    if (!q) return true;
-    return (
-      m.player1.toLowerCase().includes(q) ||
-      m.player2.toLowerCase().includes(q) ||
-      String(m.round).toLowerCase().includes(q)
-    );
-  });
-
-  let html = "";
-  if (bracketAssignments[activePickerSlot]) {
-    html += `<div class="bracket-picker-row bracket-picker-clear" id="bracket-picker-clear-row">
-      <span>Remove current assignment</span>
-    </div>`;
-  }
-
-  if (filtered.length === 0) {
-    html += `<p class="empty-state">No matches found.</p>`;
-  } else {
-    html += filtered
-      .map((m) => {
-        const { p1Wins, p2Wins } = matchScoreSummary(m);
-        return `<div class="bracket-picker-row" data-match="${m.id}">
-          <span>Round ${escapeHtml(String(m.round))} • ${escapeHtml(m.player1)} vs ${escapeHtml(m.player2)}</span>
-          <span>${p1Wins}-${p2Wins} • ${formatShortLabel(m.format)}</span>
-        </div>`;
-      })
-      .join("");
-  }
-
-  bracketPickerList.innerHTML = html;
-
-  const clearRow = document.getElementById("bracket-picker-clear-row");
-  if (clearRow) {
-    clearRow.addEventListener("click", async () => {
-      await assignBracketSlot(activePickerSlot, null);
-      closeModal(bracketPickerModal);
-    });
-  }
-
-  bracketPickerList.querySelectorAll("[data-match]").forEach((row) => {
-    row.addEventListener("click", async () => {
-      await assignBracketSlot(activePickerSlot, row.dataset.match);
-      closeModal(bracketPickerModal);
-    });
-  });
-}
-
-bracketPickerSearch.addEventListener("input", () => {
-  renderBracketPickerList(bracketPickerSearch.value);
-});
-
-async function assignBracketSlot(slotId, matchId) {
-  const previous = { ...bracketAssignments };
-  if (matchId) {
-    bracketAssignments[slotId] = matchId;
-  } else {
-    delete bracketAssignments[slotId];
-  }
-  try {
-    await saveBracketAssignments();
-    renderBracket();
-  } catch (err) {
-    console.error(err);
-    bracketAssignments = previous;
-    alert(err.message || "Failed to save bracket assignment.");
-  }
-}
-
-document
-  .getElementById("bracket-reset-btn")
-  .addEventListener("click", async () => {
-    if (Object.keys(bracketAssignments).length === 0) return;
-    if (!confirm("Clear all bracket slot assignments? This cannot be undone."))
-      return;
-    const previous = { ...bracketAssignments };
-    bracketAssignments = {};
-    try {
-      await saveBracketAssignments();
-      renderBracket();
-    } catch (err) {
-      console.error(err);
-      bracketAssignments = previous;
-      alert(err.message || "Failed to clear bracket.");
-    }
-  });

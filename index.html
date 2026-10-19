@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PvP Championship Season 1 Stats</title>
+<title>PvP Championship Stats</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" />
@@ -11,10 +11,10 @@
 </head>
 <body>
   <header class="app-header">
-    <p class="eyebrow">Competitive Match Tracker</p>
-    <h1>PvP Championship Season 1 Stats</h1>
+    <h1>PvP Championship Stats</h1>
     <nav class="tabs">
       <button class="tab-btn active" data-tab="history">Match History</button>
+      <button class="tab-btn" data-tab="add-match">Add Match</button>
       <button class="tab-btn" data-tab="players">Players</button>
       <button class="tab-btn" data-tab="kits">Kits</button>
       <button class="tab-btn" data-tab="comparison">Comparison</button>
@@ -25,16 +25,11 @@
   <div class="storage-bar">
     <span id="storage-status-text">Checking data storage&hellip;</span>
     <div class="storage-actions">
-      <button type="button" id="connect-folder-btn" class="secondary">Connect Data Folder</button>
+      <button type="button" id="connect-file-btn" class="secondary">Connect matches.json</button>
       <button type="button" id="export-matches-btn" class="secondary">Export matches.json</button>
-      <button type="button" id="export-bracket-btn" class="secondary">Export bracket.json</button>
       <label class="file-input-label secondary">
         Import matches.json
         <input type="file" id="import-matches-input" accept="application/json" hidden />
-      </label>
-      <label class="file-input-label secondary">
-        Import bracket.json
-        <input type="file" id="import-bracket-input" accept="application/json" hidden />
       </label>
     </div>
   </div>
@@ -42,52 +37,78 @@
   <main>
     <!-- MATCH HISTORY TAB -->
     <section id="tab-history" class="tab-panel active">
-      <div class="panel-grid">
-        <div class="card">
-          <h2 id="match-form-heading">Add New Match</h2>
-          <form id="match-form">
-            <div class="form-row">
-              <label>Round
-                <input type="text" id="match-round" placeholder="Round # or name" required />
-              </label>
-              <label>Format
-                <select id="match-format">
-                  <option value="bo3">Best of 3</option>
-                  <option value="bo5">Best of 5</option>
-                  <option value="grandfinal">Grand Final</option>
-                </select>
-              </label>
-            </div>
+      <div class="card">
+        <h2>Recorded Matches</h2>
+        <label>Filter by Event
+          <!-- Options populated from EVENTS in app.js, plus "All Events". -->
+          <select id="history-event-filter"></select>
+        </label>
+        <div id="match-list" class="match-list"></div>
+      </div>
+    </section>
 
-            <div class="form-row">
-              <label>Player 1
-                <input type="text" id="player1-name" list="player-names" placeholder="Enter name" required />
-              </label>
-              <label>Player 2
-                <input type="text" id="player2-name" list="player-names" placeholder="Enter name" required />
-              </label>
-              <datalist id="player-names"></datalist>
-            </div>
+    <!-- ADD MATCH TAB -->
+    <section id="tab-add-match" class="tab-panel">
+      <div class="card">
+        <h2 id="match-form-heading">Add New Match</h2>
+        <form id="match-form">
+          <div class="form-row">
+            <label>Event
+              <select id="match-event">
+                <option value="Champs 1">Champs 1</option>
+                <option value="Champs 2">Champs 2</option>
+              </select>
+            </label>
+            <label>Round
+              <!-- Options must match ROUND_DEFINITIONS in app.js — every
+                   match's round has to correspond to a real bracket slot. -->
+              <select id="match-round" required>
+                <option value="" disabled selected>-- choose round --</option>
+                <option value="1">Round 1</option>
+                <option value="LB1">Lower Round 1</option>
+                <option value="2">Round 2</option>
+                <option value="LB2">Lower Round 2</option>
+                <option value="3">Upper Semi Final</option>
+                <option value="LB3">Lower Round 3</option>
+                <option value="LB4">Lower Round 4</option>
+                <option value="LB5">Lower Round 5</option>
+                <option value="Upper Final">Upper Final</option>
+                <option value="Lower Final">Lower Final</option>
+                <option value="Grand Final">Grand Final</option>
+              </select>
+            </label>
+            <label>Format
+              <select id="match-format">
+                <option value="bo3">Best of 3</option>
+                <option value="bo5">Best of 5</option>
+                <option value="grandfinal">Grand Final</option>
+              </select>
+            </label>
+          </div>
 
-            <div id="pick-section" class="pick-section">
-              <p class="hint">Enter both player names, then choose kit picks below.</p>
-            </div>
+          <div class="form-row">
+            <label>Player 1
+              <input type="text" id="player1-name" list="player-names" placeholder="Enter name" required />
+            </label>
+            <label>Player 2
+              <input type="text" id="player2-name" list="player-names" placeholder="Enter name" required />
+            </label>
+            <datalist id="player-names"></datalist>
+          </div>
 
-            <div id="games-section" class="games-section"></div>
+          <div id="pick-section" class="pick-section">
+            <p class="hint">Enter both player names, then choose kit picks below.</p>
+          </div>
 
-            <div class="form-actions">
-              <button type="button" id="build-games-btn">Set Up Games</button>
-              <button type="submit" id="save-match-btn" disabled>Save Match</button>
-              <button type="button" id="cancel-edit-btn" class="secondary" hidden>Cancel Edit</button>
-              <span id="form-error" class="form-error"></span>
-            </div>
-          </form>
-        </div>
+          <div id="games-section" class="games-section"></div>
 
-        <div class="card">
-          <h2>Recorded Matches</h2>
-          <div id="match-list" class="match-list"></div>
-        </div>
+          <div class="form-actions">
+            <button type="button" id="build-games-btn">Set Up Games</button>
+            <button type="submit" id="save-match-btn" disabled>Save Match</button>
+            <button type="button" id="cancel-edit-btn" class="secondary" hidden>Cancel Edit</button>
+            <span id="form-error" class="form-error"></span>
+          </div>
+        </form>
       </div>
     </section>
 
@@ -95,11 +116,17 @@
     <section id="tab-players" class="tab-panel">
       <div class="card">
         <h2>Player Stats</h2>
-        <label>Select Player
-          <select id="player-select">
-            <option value="">-- Choose a player --</option>
-          </select>
-        </label>
+        <div class="form-row">
+          <label>Select Player
+            <select id="player-select">
+              <option value="">-- Choose a player --</option>
+            </select>
+          </label>
+          <label>Filter by Event
+            <!-- Options populated from EVENTS in app.js, plus "All Events". -->
+            <select id="player-event-filter"></select>
+          </label>
+        </div>
         <div id="player-details"></div>
       </div>
     </section>
@@ -108,6 +135,10 @@
     <section id="tab-kits" class="tab-panel">
       <div class="card">
         <h2>Kit Stats</h2>
+        <label>Filter by Event
+          <!-- Options populated from EVENTS in app.js, plus "All Events". -->
+          <select id="kit-event-filter"></select>
+        </label>
         <div id="kit-stats"></div>
       </div>
     </section>
@@ -134,9 +165,10 @@
       <div class="card">
         <h2>Simulate Match</h2>
         <p class="hint">
-          Predicts likely kit picks and a winner using each player's history.
-          Player 1 gets the Grand Final advantage picks (3 picks vs 1) if that
-          format is chosen.
+          Predicts each player's ban, their likely kit picks, and the
+          winner using each player's history, head-to-head record, and
+          reliability in later bracket rounds. Player 1 gets the Grand
+          Final advantage picks (3 picks vs 1) if that format is chosen.
         </p>
         <div class="form-row">
           <label>Format
@@ -157,13 +189,13 @@
       <div class="bracket-card">
         <div class="bracket-header">
           <h2>16-Player Double Elimination Bracket</h2>
-          <button type="button" id="bracket-reset-btn" class="secondary">
-            Clear All Assignments
-          </button>
         </div>
+        <nav class="bracket-event-tabs" id="bracket-event-tabs"></nav>
         <p class="hint">
-          Click any slot to assign one of your recorded matches to it. Click
-          an assigned slot to view the full match details.
+          Matches are automatically placed into the bracket based on their
+          event and round. Click an empty slot to add a match for it (the
+          event and round are filled in for you), or a filled slot to view
+          the full match details.
         </p>
         <div class="bracket-scroll">
           <div class="bracket-wrap" id="bracket-wrap">
@@ -191,20 +223,6 @@
     <div class="modal">
       <button type="button" class="modal-close" id="bracket-detail-close">&times;</button>
       <div id="bracket-detail-content"></div>
-    </div>
-  </div>
-
-  <!-- Bracket match picker modal -->
-  <div id="bracket-picker-modal" class="modal-overlay" hidden>
-    <div class="modal">
-      <button type="button" class="modal-close" id="bracket-picker-close">&times;</button>
-      <h3 id="bracket-picker-heading">Assign a match</h3>
-      <input
-        type="text"
-        id="bracket-picker-search"
-        placeholder="Search by player name or round..."
-      />
-      <div id="bracket-picker-list" class="bracket-picker-list"></div>
     </div>
   </div>
 

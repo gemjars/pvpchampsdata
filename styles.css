@@ -32,15 +32,6 @@ body {
   background: linear-gradient(180deg, #0e0f16, var(--bg));
 }
 
-.app-header .eyebrow {
-  margin: 0 0 6px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: var(--text-mute);
-}
-
 .app-header h1 {
   margin: 0 0 16px;
   font-size: 1.6rem;
@@ -141,17 +132,10 @@ main {
   display: block;
 }
 
-.panel-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 20px;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .panel-grid {
-    grid-template-columns: 1fr;
-  }
+/* Widen the centered content column specifically for Match History so the
+   recorded match cards have more room and are easier to read. */
+main:has(#tab-history.tab-panel.active) {
+  max-width: 1600px;
 }
 
 .card {
@@ -365,8 +349,8 @@ button:disabled {
 .match-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-height: 640px;
+  gap: 14px;
+  max-height: calc(100vh - 230px);
   overflow-y: auto;
 }
 
@@ -374,7 +358,7 @@ button:disabled {
   background: var(--panel-light);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 12px 14px;
+  padding: 18px 20px;
 }
 
 .match-card-header {
@@ -386,6 +370,7 @@ button:disabled {
 
 .match-title {
   font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .match-title .win {
@@ -394,8 +379,8 @@ button:disabled {
 
 .match-sub {
   color: var(--text-dim);
-  font-size: 0.8rem;
-  margin-top: 2px;
+  font-size: 0.88rem;
+  margin-top: 4px;
 }
 
 .match-card-body {
@@ -412,8 +397,8 @@ button:disabled {
 .game-line {
   display: flex;
   justify-content: space-between;
-  padding: 4px 0;
-  font-size: 0.85rem;
+  padding: 7px 0;
+  font-size: 0.95rem;
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
@@ -510,6 +495,16 @@ th {
 
 .match-history-detail .game-line:last-child {
   border-bottom: none;
+}
+
+.head-to-head {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.head-to-head h3 {
+  margin-top: 0;
 }
 
 .comparison-columns {
@@ -666,6 +661,36 @@ th {
   margin: 0;
 }
 
+.bracket-event-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 12px 0 0;
+}
+
+.bracket-event-tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  padding: 7px 16px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.bracket-event-tab:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.bracket-event-tab.active {
+  color: var(--accent);
+  background: rgba(231, 193, 99, 0.1);
+  border-color: rgba(231, 193, 99, 0.35);
+}
+
 .bracket-scroll {
   overflow: auto;
   max-height: 720px;
@@ -771,9 +796,13 @@ th {
 
 .bracket-match.empty {
   border-style: dashed;
-  color: var(--text-dim);
+  color: var(--text-mute);
   text-align: center;
   padding: 14px 10px;
+}
+
+.bracket-match.empty:hover {
+  color: var(--accent);
 }
 
 .bracket-match-players {
@@ -810,20 +839,6 @@ th {
   margin-top: 6px;
   font-size: 0.7rem;
   color: var(--text-dim);
-}
-
-.bracket-match-change {
-  background: transparent;
-  border: none;
-  color: var(--accent);
-  padding: 0;
-  font-size: 0.7rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.bracket-match-change:hover {
-  opacity: 0.8;
 }
 
 /* ---------- Modals ---------- */
@@ -873,38 +888,4 @@ th {
 
 .modal h3 {
   margin-top: 0;
-}
-
-#bracket-picker-search {
-  width: 100%;
-  margin: 4px 0 12px;
-}
-
-.bracket-picker-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
-.bracket-picker-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  background: var(--panel-light);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.bracket-picker-row:hover {
-  border-color: var(--accent);
-}
-
-.bracket-picker-clear {
-  color: var(--loss);
-  border-color: var(--loss);
 }

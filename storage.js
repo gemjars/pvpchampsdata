@@ -1,8 +1,24 @@
-const FS_SUPPORTED = typeof window.showDirectoryPicker === "function";
+// ---------- Local, no-server storage ----------
+// This app is opened directly as a file (no "npm start" / server needed).
+// Data is read from and written directly to a matches.json file using the
+// browser's File System Access API (Chrome/Edge): the first time you use
+// the app, click "Connect matches.json" and choose this project's
+// "matches.json" file (it sits alongside index.html). That file handle is
+// then remembered (via IndexedDB) so you won't be asked again on future
+// visits.
+//
+// Browsers without that API (Firefox, Safari) instead keep data in this
+// browser's local storage. Use the Export/Import buttons to keep that in
+// sync with matches.json, e.g. when moving to another machine.
+//
+// There is no separate bracket data file — the Bracket tab is derived
+// entirely from each match's "event" and "round" fields at render time.
+
+const FS_SUPPORTED = typeof window.showOpenFilePicker === "function";
 
 const IDB_NAME = "kit-tracker-storage";
 const IDB_STORE = "handles";
-const IDB_DIR_KEY = "dataDir";
+const IDB_FILE_KEY = "matchesFile";
 
 function idbOpen() {
   return new Promise((resolve, reject) => {
@@ -35,7 +51,7 @@ async function idbSet(key, value) {
   });
 }
 
-let cachedDirHandle = null;
+let cachedFileHandle = null;
 
 async function hasPermission(handle, mode) {
   return (await handle.queryPermission({ mode })) === "granted";
@@ -46,18 +62,21 @@ async function requestPermission(handle, mode) {
   return (await handle.requestPermission({ mode })) === "granted";
 }
 
-// Reuses a previously-granted folder handle without prompting the user.
+// Reuses a previously-granted file handle without prompting the user.
 // Returns null if none is remembered or permission is no longer granted.
-async function getSavedDirectoryHandle() {
+async function getSavedFileHandle() {
   if (!FS_SUPPORTED) return null;
-  if (cachedDirHandle && (await hasPermission(cachedDirHandle, "readwrite"))) {
-    return cachedDirHandle;
+  if (
+    cachedFileHandle &&
+    (await hasPermission(cachedFileHandle, "readwrite"))
+  ) {
+    return cachedFileHandle;
   }
   try {
-    const saved = await idbGet(IDB_DIR_KEY);
+    const saved = await idbGet(IDB_FILE_KEY);
     if (saved && (await hasPermission(saved, "readwrite"))) {
-      cachedDirHandle = saved;
-      return cachedDirHandle;
+      cachedFileHandle = saved;
+      return cachedFileHandle;
     }
   } catch (err) {
     console.error(err);
@@ -66,23 +85,29 @@ async function getSavedDirectoryHandle() {
 }
 
 // Must be called from a click handler: prompts the user to choose the
-// "data" folder and remembers it for future visits.
-async function chooseDirectoryHandle() {
-  const handle = await window.showDirectoryPicker({
-    id: "kit-tracker-data",
-    mode: "readwrite",
+// matches.json file and remembers it for future visits.
+async function chooseMatchesFile() {
+  const [handle] = await window.showOpenFilePicker({
+    id: "kit-tracker-matches-file",
+    types: [
+      {
+        description: "JSON file",
+        accept: { "application/json": [".json"] },
+      },
+    ],
+    excludeAcceptAllOption: false,
+    multiple: false,
   });
   if (!(await requestPermission(handle, "readwrite"))) {
-    throw new Error("Permission to read/write that folder was denied.");
+    throw new Error("Permission to read/write that file was denied.");
   }
-  cachedDirHandle = handle;
-  await idbSet(IDB_DIR_KEY, handle);
+  cachedFileHandle = handle;
+  await idbSet(IDB_FILE_KEY, handle);
   return handle;
 }
 
-async function readJsonFromDir(dir, name, fallback) {
+async function readJsonFromFile(fileHandle, fallback) {
   try {
-    const fileHandle = await dir.getFileHandle(name);
     const file = await fileHandle.getFile();
     const text = await file.text();
     return text.trim() ? JSON.parse(text) : fallback;
@@ -92,8 +117,7 @@ async function readJsonFromDir(dir, name, fallback) {
   }
 }
 
-async function writeJsonToDir(dir, name, data) {
-  const fileHandle = await dir.getFileHandle(name, { create: true });
+async function writeJsonToFile(fileHandle, data) {
   const writable = await fileHandle.createWritable();
   await writable.write(JSON.stringify(data, null, 2));
   await writable.close();
@@ -101,7 +125,6 @@ async function writeJsonToDir(dir, name, data) {
 
 // ---------- localStorage fallback ----------
 const LS_MATCHES_KEY = "kit-tracker-matches";
-const LS_BRACKET_KEY = "kit-tracker-bracket";
 
 function readLocalStorageJson(key, fallback) {
   try {
@@ -122,32 +145,20 @@ const DataStore = {
   isFileSystemSupported: FS_SUPPORTED,
 
   async isConnected() {
-    return (await getSavedDirectoryHandle()) !== null;
+    return (await getSavedFileHandle()) !== null;
   },
 
-  chooseDirectoryHandle,
+  chooseMatchesFile,
 
   async loadMatches() {
-    const dir = await getSavedDirectoryHandle();
-    if (dir) return readJsonFromDir(dir, "matches.json", []);
+    const fileHandle = await getSavedFileHandle();
+    if (fileHandle) return readJsonFromFile(fileHandle, []);
     return readLocalStorageJson(LS_MATCHES_KEY, []);
   },
 
   async saveMatches(matches) {
-    const dir = await getSavedDirectoryHandle();
-    if (dir) return writeJsonToDir(dir, "matches.json", matches);
+    const fileHandle = await getSavedFileHandle();
+    if (fileHandle) return writeJsonToFile(fileHandle, matches);
     writeLocalStorageJson(LS_MATCHES_KEY, matches);
-  },
-
-  async loadBracket() {
-    const dir = await getSavedDirectoryHandle();
-    if (dir) return readJsonFromDir(dir, "bracket.json", {});
-    return readLocalStorageJson(LS_BRACKET_KEY, {});
-  },
-
-  async saveBracket(assignments) {
-    const dir = await getSavedDirectoryHandle();
-    if (dir) return writeJsonToDir(dir, "bracket.json", assignments);
-    writeLocalStorageJson(LS_BRACKET_KEY, assignments);
   },
 };
