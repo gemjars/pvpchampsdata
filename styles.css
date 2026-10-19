@@ -213,11 +213,12 @@ input:focus, select:focus {
   font-size: 0.85rem;
 }
 
-.pick-group {
-  margin-bottom: 12px;
+/* ---------- Drag-and-drop kit board (Add/Edit Match) ---------- */
+.kit-zone-wrap {
+  margin-bottom: 14px;
 }
 
-.pick-group h4 {
+.kit-zone-wrap h4 {
   margin: 0 0 8px;
   font-size: 0.72rem;
   font-weight: 600;
@@ -226,15 +227,68 @@ input:focus, select:focus {
   color: var(--text-mute);
 }
 
-.pick-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
+.zone-count {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
 }
 
-.pick-row label {
-  min-width: 140px;
+.kit-board-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+}
+
+.kit-zone {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 8px;
+  min-height: 42px;
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.kit-zone.zone-ok {
+  border-color: rgba(74, 222, 128, 0.5);
+}
+
+.kit-zone.zone-error {
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.kit-pool {
+  min-height: 48px;
+}
+
+.kit-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--panel-light);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: grab;
+  user-select: none;
+}
+
+.kit-chip:hover {
+  border-color: var(--accent);
+}
+
+.kit-chip.dragging {
+  opacity: 0.4;
+}
+
+@media (max-width: 700px) {
+  .kit-board-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .games-section {
@@ -247,7 +301,7 @@ input:focus, select:focus {
 
 .game-row {
   display: grid;
-  grid-template-columns: 130px 1fr 90px 90px;
+  grid-template-columns: 22px 130px 1fr 90px 90px;
   gap: 10px;
   align-items: center;
   background: var(--panel-light);
@@ -255,6 +309,40 @@ input:focus, select:focus {
   border-radius: 6px;
   padding: 8px 12px;
   transition: opacity 0.15s;
+}
+
+.game-drag-handle {
+  color: var(--text-mute);
+  font-size: 1rem;
+  line-height: 1;
+  text-align: center;
+  user-select: none;
+}
+
+.game-drag-handle[title] {
+  cursor: grab;
+}
+
+.game-container.dragging .game-row {
+  opacity: 0.4;
+}
+
+.ban-container {
+  margin-bottom: 8px;
+}
+
+.ban-container.dragging .game-row {
+  opacity: 0.4;
+}
+
+.game-row.ban-row {
+  grid-template-columns: 22px 130px 1fr;
+  border-style: dashed;
+}
+
+.badge.ban-badge {
+  color: var(--loss);
+  border-color: rgba(248, 113, 113, 0.35);
 }
 
 .game-row.pending {
@@ -404,6 +492,14 @@ button:disabled {
 
 .game-line:last-child {
   border-bottom: none;
+}
+
+.bans-summary {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .badge {

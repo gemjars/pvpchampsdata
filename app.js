@@ -94,7 +94,12 @@ let matches = [];
 let pendingGames = null; // games array built by "Set Up Games" before save
 let currentEvaluation = null; // { finalGames, winner } once the match has been clinched
 let currentPicks = null; // { player1: [kits], player2: [kits], decider } for the in-progress form
+let currentBans = null; // { player1: [kits], player2: [kits] } for the in-progress form
+let currentBanOrder = null; // flat [kits] in true chronological ban order (across both players), for the in-progress form
 let editingMatchId = null; // set while editing an existing match instead of creating a new one
+let dragChipOriginZone = null; // zone name a kit-board chip drag started in, for detecting a pure reorder
+let dragGameRow = null; // the .game-container currently being dragged in the score-entry list, if any
+let dragBanRow = null; // the .ban-container currently being dragged in the score-entry list, if any
 
 async function fetchMatches() {
   return DataStore.loadMatches();
@@ -158,7 +163,8 @@ const matchForm = document.getElementById("match-form");
   });
 });
 
-function picksForFormat(format) {
+function picksForFormat(format, event) {
+  if (format === "grandfinal" && event === "Champs 2") return { p1: 2, p2: 2 };
   if (format === "bo5") return { p1: 2, p2: 2 };
   if (format === "grandfinal") return { p1: 3, p2: 1 };
   return { p1: 1, p2: 1 }; // bo3
@@ -184,7 +190,15 @@ function resetGamesSection() {
   formError.textContent = "";
 }
 
-// ---------- Pick Section ----------
+// ---------- Pick Section (drag-and-drop kit board) ----------
+// As soon as the event, format, and both player names are set, every kit
+// available for that event appears as a draggable chip in "Available
+// Kits". Drag chips into a player's Bans or Picks zone, or the Decider
+// zone, to record the whole veto in one view; drag within a zone to
+// reorder (pick order determines play order). Drag a chip back to
+// "Available Kits" to undo it.
+let dragChip = null; // the .kit-chip currently being dragged, if any
+
 function renderPickSection() {
   const p1 = player1Input.value.trim();
   const p2 = player2Input.value.trim();
@@ -198,104 +212,234 @@ function renderPickSection() {
     return;
   }
 
-  const picks = picksForFormat(formatSelect.value);
-
-  let html = "";
-  html += buildPickGroup("p1", p1, picks.p1);
-  html += buildPickGroup("p2", p2, picks.p2);
-  html += `<div class="pick-group" id="decider-group">
-    <h4>Decider</h4>
-    <div class="pick-row" id="decider-row"></div>
-  </div>`;
-
-  pickSection.innerHTML = html;
-
-  // attach listeners
-  pickSection.querySelectorAll("select.pick-kit").forEach((sel) => {
-    sel.addEventListener("change", () => {
-      updatePickOptions();
-      resetGamesSection();
-    });
-  });
-
-  updatePickOptions();
-}
-
-function buildPickGroup(prefix, playerName, picksEach) {
+  const picks = picksForFormat(formatSelect.value, eventSelect.value);
   const availableKits = kitsForEvent(eventSelect.value);
-  let rows = "";
-  for (let i = 0; i < picksEach; i++) {
-    rows += `<label>Kit pick ${picksEach > 1 ? i + 1 : ""}
-      <select class="pick-kit" data-role="${prefix}" id="${prefix}-pick-${i}">
-        <option value="">-- choose --</option>
-        ${availableKits.map((k) => `<option value="${k}">${kitDisplayName(k)}</option>`).join("")}
-      </select>
-    </label>`;
-  }
-  return `<div class="pick-group">
-    <h4>${escapeHtml(playerName)}'s picks</h4>
-    <div class="pick-row">${rows}</div>
-  </div>`;
+
+  pickSection.innerHTML = `
+    <div class="kit-zone-wrap">
+      <h4>Available Kits</h4>
+      <div class="kit-zone kit-pool" data-zone="pool"></div>
+    </div>
+    <div class="kit-board-grid">
+      <div class="kit-zone-wrap">
+        <h4>${escapeHtml(p1)}'s Bans</h4>
+        <div class="kit-zone" data-zone="p1-bans"></div>
+      </div>
+      <div class="kit-zone-wrap">
+        <h4>${escapeHtml(p2)}'s Bans</h4>
+        <div class="kit-zone" data-zone="p2-bans"></div>
+      </div>
+      <div class="kit-zone-wrap">
+        <h4>${escapeHtml(p1)}'s Picks <span class="zone-count" data-count-for="p1-picks"></span></h4>
+        <div class="kit-zone" data-zone="p1-picks" data-required="${picks.p1}"></div>
+      </div>
+      <div class="kit-zone-wrap">
+        <h4>${escapeHtml(p2)}'s Picks <span class="zone-count" data-count-for="p2-picks"></span></h4>
+        <div class="kit-zone" data-zone="p2-picks" data-required="${picks.p2}"></div>
+      </div>
+      <div class="kit-zone-wrap">
+        <h4>Decider <span class="zone-count" data-count-for="decider"></span></h4>
+        <div class="kit-zone" data-zone="decider" data-required="1"></div>
+      </div>
+    </div>
+    <p class="hint">Drag kits from "Available Kits" into a zone to ban or pick them — drag within a zone to reorder (pick order sets play order), or back to "Available Kits" to undo.</p>
+  `;
+
+  const poolZone = pickSection.querySelector('[data-zone="pool"]');
+  availableKits.forEach((kit) => poolZone.appendChild(createKitChip(kit)));
+
+  pickSection
+    .querySelectorAll(".kit-zone")
+    .forEach((zone) => enableKitDropZone(zone));
+
+  updateZoneStatus();
 }
 
-function getAllPickSelects() {
-  return Array.from(pickSection.querySelectorAll("select.pick-kit"));
-}
+function createKitChip(kit) {
+  const chip = document.createElement("div");
+  chip.className = "kit-chip";
+  chip.draggable = true;
+  chip.dataset.kit = kit;
+  chip.textContent = kitDisplayName(kit);
 
-function updatePickOptions() {
-  const selects = getAllPickSelects();
-  const chosenValues = selects.map((s) => s.value).filter(Boolean);
+  chip.addEventListener("dragstart", () => {
+    dragChip = chip;
+    dragChipOriginZone = chip.closest(".kit-zone")?.dataset.zone || null;
+    requestAnimationFrame(() => chip.classList.add("dragging"));
+  });
+  chip.addEventListener("dragend", () => {
+    chip.classList.remove("dragging");
+    const newZone = chip.closest(".kit-zone")?.dataset.zone || null;
+    const zoneChanged = newZone !== dragChipOriginZone;
+    dragChip = null;
+    dragChipOriginZone = null;
+    updateZoneStatus();
 
-  selects.forEach((sel) => {
-    const current = sel.value;
-    Array.from(sel.options).forEach((opt) => {
-      if (opt.value === "") return;
-      const chosenElsewhere =
-        chosenValues.includes(opt.value) && opt.value !== current;
-      opt.disabled = chosenElsewhere;
-    });
+    if (zoneChanged) {
+      // Moving a kit into/out of a zone changes what's banned or picked,
+      // so any already-built games are no longer valid.
+      resetGamesSection();
+    } else if (newZone === "p1-bans" || newZone === "p2-bans") {
+      // A pure reorder within a Bans zone only changes the recorded ban
+      // order, not what's played — keep currentBans (and the score-entry
+      // ban rows, if already visible) in sync without touching any scores.
+      syncBansFromZones();
+    } else if (
+      pendingGames &&
+      (newZone === "p1-picks" || newZone === "p2-picks" || newZone === "decider")
+    ) {
+      // A pure reorder within a Picks/Decider zone changes play order but
+      // not what's picked — re-sync the already-built games to the new
+      // order instead of discarding any scores already entered.
+      resyncGamesFromZones();
+    }
   });
 
-  renderDeciderRow(chosenValues);
+  return chip;
 }
 
-function renderDeciderRow(chosenValues) {
-  const remaining = kitsForEvent(eventSelect.value).filter(
-    (k) => !chosenValues.includes(k),
-  );
-  const row = document.getElementById("decider-row");
-  if (!row) return;
+// Lets any zone accept a drop from any other zone (or the pool) — there's
+// no "origin" restriction, so chips move freely between bans, picks, the
+// decider, and back to the pool.
+function enableKitDropZone(zone) {
+  if (zone.dataset.dropBound === "true") return;
+  zone.dataset.dropBound = "true";
 
-  if (chosenValues.length === 0 || chosenValues.some((v) => !v)) {
-    row.innerHTML = `<span class="hint">Finish selecting kit picks first.</span>`;
+  zone.addEventListener("dragover", (e) => {
+    if (!dragChip) return;
+    e.preventDefault();
+    const afterElement = getDragAfterElement(zone, e.clientX);
+    if (afterElement == null) {
+      zone.appendChild(dragChip);
+    } else {
+      zone.insertBefore(dragChip, afterElement);
+    }
+  });
+}
+
+function getDragAfterElement(container, x) {
+  const items = Array.from(
+    container.querySelectorAll(".kit-chip:not(.dragging)"),
+  );
+  return items.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = x - box.left - box.width / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      }
+      return closest;
+    },
+    { offset: -Infinity, element: null },
+  ).element;
+}
+
+function getZoneKits(zoneName) {
+  const zone = pickSection.querySelector(`[data-zone="${zoneName}"]`);
+  if (!zone) return [];
+  return Array.from(zone.querySelectorAll(".kit-chip")).map(
+    (chip) => chip.dataset.kit,
+  );
+}
+
+// Moves the chip for each given kit value (in order) into the named zone,
+// wherever that chip currently sits — used both live (nothing to do here,
+// drag handles it) and when restoring a saved match's picks/bans into
+// their zones on edit.
+function moveKitsToZone(kits, zoneName) {
+  const zone = pickSection.querySelector(`[data-zone="${zoneName}"]`);
+  if (!zone) return;
+  kits.forEach((kit) => {
+    const chip = pickSection.querySelector(`.kit-chip[data-kit="${kit}"]`);
+    if (chip) zone.appendChild(chip);
+  });
+}
+
+// Rebuilds the already-built games list from the Picks/Decider zones'
+// current order, without discarding scores the user has already entered —
+// used when a kit is reordered within one of those zones (not moved to a
+// different zone) while "Set Up Games" has already been clicked.
+function resyncGamesFromZones() {
+  const p1 = player1Input.value.trim();
+  const p2 = player2Input.value.trim();
+  const required = picksForFormat(formatSelect.value, eventSelect.value);
+  const p1Picks = getZoneKits("p1-picks");
+  const p2Picks = getZoneKits("p2-picks");
+  const deciderKits = getZoneKits("decider");
+
+  if (
+    p1Picks.length !== required.p1 ||
+    p2Picks.length !== required.p2 ||
+    deciderKits.length !== 1
+  ) {
+    // Shouldn't normally happen for a pure same-zone reorder, but if the
+    // zones aren't in a buildable state anymore, fall back to a reset.
+    resetGamesSection();
     return;
   }
 
-  if (remaining.length === 1) {
-    row.innerHTML = `<input type="hidden" id="decider-select" value="${remaining[0]}" />
-      <span class="badge decider">${kitDisplayName(remaining[0])}</span>`;
-  } else if (remaining.length > 1) {
-    row.innerHTML = `<label>Choose decider kit
-      <select id="decider-select">
-        <option value="">-- choose --</option>
-        ${remaining.map((k) => `<option value="${k}">${kitDisplayName(k)}</option>`).join("")}
-      </select>
-    </label>`;
-    document
-      .getElementById("decider-select")
-      .addEventListener("change", resetGamesSection);
-  } else {
-    row.innerHTML = `<span class="hint">No kits remaining.</span>`;
-  }
+  // Capture whatever scores are already entered, keyed by kit, so they
+  // survive the rebuild even though the games move to new positions.
+  const scoresByKit = {};
+  gamesSection.querySelectorAll(".game-container").forEach((row) => {
+    const s1 = row.querySelector('.score-input[data-player="1"]');
+    const s2 = row.querySelector('.score-input[data-player="2"]');
+    scoresByKit[row.dataset.kit] = {
+      v1: s1 ? s1.value : "",
+      v2: s2 ? s2.value : "",
+    };
+  });
+
+  const decider = deciderKits[0];
+  pendingGames = buildPlayOrder(formatSelect.value, p1Picks, p2Picks, decider);
+  currentPicks = { player1: p1Picks, player2: p2Picks, decider };
+
+  renderGamesSection(pendingGames, p1, p2);
+
+  pendingGames.forEach((g, idx) => {
+    const saved = scoresByKit[g.kit];
+    if (!saved) return;
+    const s1 = gamesSection.querySelector(
+      `.score-input[data-idx="${idx}"][data-player="1"]`,
+    );
+    const s2 = gamesSection.querySelector(
+      `.score-input[data-idx="${idx}"][data-player="2"]`,
+    );
+    if (s1 && saved.v1 !== "") s1.value = saved.v1;
+    if (s2 && saved.v2 !== "") s2.value = saved.v2;
+  });
+
+  updateGameProgress();
+}
+
+// Highlights each Picks/Decider zone green once it holds exactly the
+// required number of kits (red otherwise) and keeps the "(x/y)" counts in
+// the zone headings up to date. Bans and the pool have no required count.
+function updateZoneStatus() {
+  pickSection.querySelectorAll(".kit-zone[data-required]").forEach((zone) => {
+    const required = Number(zone.dataset.required);
+    const count = zone.querySelectorAll(".kit-chip").length;
+    zone.classList.toggle("zone-ok", count === required);
+    zone.classList.toggle("zone-error", count !== required);
+    const zoneName = zone.dataset.zone;
+    const countLabel = pickSection.querySelector(
+      `[data-count-for="${zoneName}"]`,
+    );
+    if (countLabel) countLabel.textContent = `(${count}/${required})`;
+  });
 }
 
 // Builds the ordered list of games as they are actually played.
-// Grand Final is not simply "all of player1's picks, then player2's pick":
-// the real play order interleaves player2's single pick between player1's
-// second and third picks: P1 pick1, P1 pick2, P2 pick1, P1 pick3, Decider.
+// The 3-picks-vs-1 Grand Final (Champs 1 and any other non-Champs-2 event)
+// is not simply "all of player1's picks, then player2's pick": the real
+// play order interleaves player2's single pick between player1's second
+// and third picks: P1 pick1, P1 pick2, P2 pick1, P1 pick3, Decider.
+// Champs 2's Grand Final uses a plain symmetric 2-vs-2 pick order instead
+// (same shape as Best of 5), detected here by the picks arrays' lengths
+// rather than the format string, since both are "grandfinal".
 function buildPlayOrder(format, p1Picks, p2Picks, decider) {
   let picks;
-  if (format === "grandfinal") {
+  if (format === "grandfinal" && p1Picks.length === 3 && p2Picks.length === 1) {
     picks = [
       { kit: p1Picks[0], pickedBy: "player1" },
       { kit: p1Picks[1], pickedBy: "player1" },
@@ -323,29 +467,41 @@ buildGamesBtn.addEventListener("click", () => {
     return;
   }
 
-  const p1Picks = Array.from(
-    pickSection.querySelectorAll('select[data-role="p1"]'),
-  ).map((s) => s.value);
-  const p2Picks = Array.from(
-    pickSection.querySelectorAll('select[data-role="p2"]'),
-  ).map((s) => s.value);
-  const deciderEl = document.getElementById("decider-select");
-  const decider = deciderEl ? deciderEl.value : "";
+  const required = picksForFormat(formatSelect.value, eventSelect.value);
+  const p1Bans = getZoneKits("p1-bans");
+  const p2Bans = getZoneKits("p2-bans");
+  const p1Picks = getZoneKits("p1-picks");
+  const p2Picks = getZoneKits("p2-picks");
+  const deciderKits = getZoneKits("decider");
 
-  if (p1Picks.some((v) => !v) || p2Picks.some((v) => !v) || !decider) {
-    formError.textContent =
-      "Please complete all kit pick selections and the decider.";
+  if (p1Picks.length !== required.p1) {
+    formError.textContent = `${escapeHtml(p1)} needs exactly ${required.p1} pick${required.p1 === 1 ? "" : "s"} in their Picks zone (currently ${p1Picks.length}).`;
+    return;
+  }
+  if (p2Picks.length !== required.p2) {
+    formError.textContent = `${escapeHtml(p2)} needs exactly ${required.p2} pick${required.p2 === 1 ? "" : "s"} in their Picks zone (currently ${p2Picks.length}).`;
+    return;
+  }
+  if (deciderKits.length !== 1) {
+    formError.textContent = "Drag exactly one kit into the Decider zone.";
     return;
   }
 
+  const decider = deciderKits[0];
   const games = buildPlayOrder(formatSelect.value, p1Picks, p2Picks, decider);
 
   currentPicks = { player1: p1Picks, player2: p2Picks, decider };
+  currentBans = { player1: p1Bans, player2: p2Bans };
+  currentBanOrder = [...p1Bans, ...p2Bans];
   pendingGames = games;
-  renderGamesSection(games, p1, p2);
+  renderGamesSection(games, p1, p2, currentBans, currentBanOrder);
 });
 
-function renderGamesSection(games, p1, p2) {
+function renderGamesSection(games, p1, p2, bans, banOrder) {
+  bans = bans || currentBans || { player1: [], player2: [] };
+  banOrder = banOrder || currentBanOrder;
+  const banRowsHtml = buildBanRowsHtml(bans, p1, p2, banOrder);
+
   const rows = games
     .map((g, idx) => {
       const label =
@@ -355,8 +511,13 @@ function renderGamesSection(games, p1, p2) {
             ? `Picked by ${escapeHtml(p2)}`
             : "Decider";
       const badgeClass = g.pickedBy === "decider" ? "badge decider" : "badge";
-      return `<div class="game-container" data-idx="${idx}">
+      const handle =
+        g.pickedBy === "decider"
+          ? `<div class="game-drag-handle" aria-hidden="true"></div>`
+          : `<div class="game-drag-handle" title="Drag to reorder play order">⠿</div>`;
+      return `<div class="game-container" data-idx="${idx}" data-kit="${g.kit}" data-picked-by="${g.pickedBy}">
         <div class="game-row">
+          ${handle}
           <div class="kit-name">${kitDisplayName(g.kit)}</div>
           <div class="picked-by"><span class="${badgeClass}">${label}</span></div>
           <input type="number" min="0" class="score-input" data-idx="${idx}" data-player="1" placeholder="${escapeHtml(p1)} score" />
@@ -367,11 +528,275 @@ function renderGamesSection(games, p1, p2) {
     })
     .join("");
 
-  gamesSection.innerHTML = `<h4>Enter scores for each kit, in order played</h4>${rows}<div id="match-progress" class="match-progress"></div>`;
+  gamesSection.innerHTML = `<h4>Enter scores for each kit, in order played</h4><p class="hint">Drag the ⠿ handle to reorder bans or the play order — bans can go anywhere in the list (even after picks), and the decider always stays last.</p>${banRowsHtml}${rows}<div id="match-progress" class="match-progress"></div>`;
 
   gamesSection.querySelectorAll(".score-input").forEach((input) => {
     input.addEventListener("input", updateGameProgress);
   });
+
+  gamesSection
+    .querySelectorAll(".game-container")
+    .forEach((row) => enableGameRowDrag(row));
+  gamesSection
+    .querySelectorAll(".ban-container")
+    .forEach((row) => enableBanRowDrag(row));
+  enableGamesSectionDropZone();
+
+  updateGameProgress();
+}
+
+// Builds the (draggable) ban rows shown in the score-entry list — in
+// banOrder's sequence if given (the true chronological order across both
+// players, which may have been custom-arranged by dragging), otherwise
+// player1's bans first then player2's, by default. Bans have no score to
+// enter, so each row is just a kit name and who banned it, with a ⠿
+// handle to reorder.
+function buildBanRowsHtml(bans, p1, p2, banOrder) {
+  const p1Bans = bans.player1 || [];
+  const p2Bans = bans.player2 || [];
+  const combined = [...p1Bans, ...p2Bans];
+  const p1Set = new Set(p1Bans);
+
+  const orderedKits =
+    banOrder && banOrder.length === combined.length ? banOrder : combined;
+
+  return orderedKits
+    .map((kit, idx) => {
+      const bannedBy = p1Set.has(kit) ? "player1" : "player2";
+      const name = bannedBy === "player1" ? p1 : p2;
+      return `<div class="ban-container" data-ban-idx="${idx}" data-kit="${kit}" data-banned-by="${bannedBy}">
+        <div class="game-row ban-row">
+          <div class="game-drag-handle" title="Drag to reorder ban order">⠿</div>
+          <div class="kit-name">${kitDisplayName(kit)}</div>
+          <div class="picked-by"><span class="badge ban-badge">Banned by ${escapeHtml(name)}</span></div>
+        </div>
+      </div>`;
+    })
+    .join("");
+}
+
+// Lets the user drag a game row (by its ⠿ handle) to change the actual
+// play order after "Set Up Games" has already built the list — the handle
+// (not the whole row) is what's draggable so dragging/typing in the score
+// inputs is unaffected. The decider row is never draggable and always
+// stays last.
+function enableGameRowDrag(row) {
+  if (row.dataset.pickedBy === "decider") return;
+  const handle = row.querySelector(".game-drag-handle");
+  if (!handle) return;
+
+  handle.addEventListener("mousedown", () => {
+    row.draggable = true;
+    window.addEventListener("mouseup", () => { row.draggable = false; }, { once: true });
+  });
+
+  row.addEventListener("dragstart", () => {
+    dragGameRow = row;
+    requestAnimationFrame(() => row.classList.add("dragging"));
+  });
+  row.addEventListener("dragend", () => {
+    row.classList.remove("dragging");
+    row.draggable = false;
+    dragGameRow = null;
+    syncGamesOrderFromDom();
+  });
+}
+
+// Lets the user drag a ban row (by its ⠿ handle) anywhere in the list —
+// before or after any pick row, or even after the decider — since a ban's
+// position relative to picks is purely informational. Dragging one never
+// touches pendingGames or any already-entered scores.
+function enableBanRowDrag(row) {
+  const handle = row.querySelector(".game-drag-handle");
+  if (!handle) return;
+
+  handle.addEventListener("mousedown", () => {
+    row.draggable = true;
+    window.addEventListener("mouseup", () => { row.draggable = false; }, { once: true });
+  });
+
+  row.addEventListener("dragstart", () => {
+    dragBanRow = row;
+    requestAnimationFrame(() => row.classList.add("dragging"));
+  });
+  row.addEventListener("dragend", () => {
+    row.classList.remove("dragging");
+    row.draggable = false;
+    dragBanRow = null;
+    syncBanOrderFromDom();
+  });
+}
+
+// After a kit-board Bans zone is reordered (pure same-zone drag, not a
+// move to/from a different zone), updates the labels of the existing ban
+// rows in place (rather than moving/recreating them) so any custom
+// interleaving with the pick rows is preserved — only which kit occupies
+// each "ban slot" changes, not where the slots themselves sit in the list.
+function resyncBanRowsDisplay() {
+  const banRows = Array.from(gamesSection.querySelectorAll(".ban-container"));
+  if (banRows.length === 0) return; // games section not built yet, nothing to sync
+  const p1 = player1Input.value.trim();
+  const p2 = player2Input.value.trim();
+
+  const targetBans = [
+    ...getZoneKits("p1-bans").map((kit) => ({ kit, bannedBy: "player1" })),
+    ...getZoneKits("p2-bans").map((kit) => ({ kit, bannedBy: "player2" })),
+  ];
+  if (targetBans.length !== banRows.length) return; // shouldn't happen for a pure reorder
+
+  banRows.forEach((row, i) => {
+    const { kit, bannedBy } = targetBans[i];
+    const name = bannedBy === "player1" ? p1 : p2;
+    row.dataset.kit = kit;
+    row.dataset.bannedBy = bannedBy;
+    const kitNameEl = row.querySelector(".kit-name");
+    if (kitNameEl) kitNameEl.textContent = kitDisplayName(kit);
+    const badgeEl = row.querySelector(".badge");
+    if (badgeEl) badgeEl.textContent = `Banned by ${name}`;
+  });
+
+  currentBanOrder = Array.from(
+    gamesSection.querySelectorAll(".ban-container"),
+  ).map((row) => row.dataset.kit);
+}
+
+// Reads the Bans zones' current order directly and stores it as
+// currentBans — used whenever a kit is reordered within a Bans zone, so
+// the saved match reflects the latest order even before "Set Up Games"
+// has (re)built the score-entry list.
+function syncBansFromZones() {
+  currentBans = {
+    player1: getZoneKits("p1-bans"),
+    player2: getZoneKits("p2-bans"),
+  };
+  resyncBanRowsDisplay();
+}
+
+// Binds the drop target behaviour to the games-section container once;
+// since renderGamesSection only replaces the container's children (not the
+// container itself), this stays bound across re-renders.
+function enableGamesSectionDropZone() {
+  if (gamesSection.dataset.dropBound === "true") return;
+  gamesSection.dataset.dropBound = "true";
+
+  gamesSection.addEventListener("dragover", (e) => {
+    if (dragGameRow) {
+      e.preventDefault();
+      const afterElement = getGameDragAfterElement(gamesSection, e.clientY);
+      const deciderRow = gamesSection.querySelector(
+        '.game-container[data-picked-by="decider"]',
+      );
+      if (afterElement == null) {
+        if (deciderRow) gamesSection.insertBefore(dragGameRow, deciderRow);
+        else gamesSection.appendChild(dragGameRow);
+      } else {
+        gamesSection.insertBefore(dragGameRow, afterElement);
+      }
+    } else if (dragBanRow) {
+      e.preventDefault();
+      // Bans can go anywhere in the full list, so positioning considers
+      // every row (ban and pick/decider alike) — not just other bans.
+      const afterElement = getAnyRowDragAfterElement(gamesSection, e.clientY);
+      if (afterElement == null) gamesSection.appendChild(dragBanRow);
+      else gamesSection.insertBefore(dragBanRow, afterElement);
+    }
+  });
+}
+
+function getGameDragAfterElement(container, y) {
+  const items = Array.from(
+    container.querySelectorAll(".game-container:not(.dragging)"),
+  ).filter((el) => el.dataset.pickedBy !== "decider");
+  return items.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      }
+      return closest;
+    },
+    { offset: -Infinity, element: null },
+  ).element;
+}
+
+function getAnyRowDragAfterElement(container, y) {
+  const items = Array.from(
+    container.querySelectorAll(
+      ".ban-container:not(.dragging), .game-container:not(.dragging)",
+    ),
+  );
+  return items.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      }
+      return closest;
+    },
+    { offset: -Infinity, element: null },
+  ).element;
+}
+
+// After a ban row is dragged to a new position (anywhere in the list),
+// renumbers data-ban-idx, rebuilds currentBans and currentBanOrder from
+// the new order, and mirrors currentBans back into the kit board's Bans
+// zones — bans have no play order effect, so pendingGames and any entered
+// scores are left completely untouched.
+function syncBanOrderFromDom() {
+  const rows = Array.from(gamesSection.querySelectorAll(".ban-container"));
+  rows.forEach((row, idx) => { row.dataset.banIdx = idx; });
+
+  currentBanOrder = rows.map((r) => r.dataset.kit);
+  currentBans = {
+    player1: rows
+      .filter((r) => r.dataset.bannedBy === "player1")
+      .map((r) => r.dataset.kit),
+    player2: rows
+      .filter((r) => r.dataset.bannedBy === "player2")
+      .map((r) => r.dataset.kit),
+  };
+
+  moveKitsToZone(currentBans.player1, "p1-bans");
+  moveKitsToZone(currentBans.player2, "p2-bans");
+}
+
+// After a game row is dragged to a new position, renumbers every row's
+// data-idx (and its score input / note) to match, rebuilds pendingGames
+// and currentPicks to reflect the new play order, and mirrors the new
+// pick order back into the kit board's Picks zones — all without
+// recreating any DOM nodes, so scores already entered are preserved.
+function syncGamesOrderFromDom() {
+  const rows = Array.from(gamesSection.querySelectorAll(".game-container"));
+  rows.forEach((row, idx) => {
+    row.dataset.idx = idx;
+    const s1 = row.querySelector('.score-input[data-player="1"]');
+    const s2 = row.querySelector('.score-input[data-player="2"]');
+    if (s1) s1.dataset.idx = idx;
+    if (s2) s2.dataset.idx = idx;
+    const note = row.querySelector(".game-note");
+    if (note) note.dataset.noteIdx = idx;
+  });
+
+  pendingGames = rows.map((row) => ({
+    kit: row.dataset.kit,
+    pickedBy: row.dataset.pickedBy,
+  }));
+
+  currentPicks = {
+    player1: pendingGames
+      .filter((g) => g.pickedBy === "player1")
+      .map((g) => g.kit),
+    player2: pendingGames
+      .filter((g) => g.pickedBy === "player2")
+      .map((g) => g.kit),
+    decider: (pendingGames.find((g) => g.pickedBy === "decider") || {}).kit,
+  };
+
+  moveKitsToZone(currentPicks.player1, "p1-picks");
+  moveKitsToZone(currentPicks.player2, "p2-picks");
+  updateZoneStatus();
 
   updateGameProgress();
 }
@@ -530,6 +955,8 @@ matchForm.addEventListener("submit", async (e) => {
     format,
     player1: p1,
     player2: p2,
+    bans: currentBans || { player1: [], player2: [] },
+    banOrder: currentBanOrder || [],
     picks: currentPicks,
     games: currentEvaluation.finalGames,
     winner: currentEvaluation.winner,
@@ -562,6 +989,8 @@ matchForm.addEventListener("submit", async (e) => {
 function exitEditMode() {
   editingMatchId = null;
   currentPicks = null;
+  currentBans = null;
+  currentBanOrder = null;
   formHeading.textContent = "Add New Match";
   saveMatchBtn.textContent = "Save Match";
   cancelEditBtn.hidden = true;
@@ -589,6 +1018,10 @@ function startEditMatch(id) {
 
   renderPickSection();
 
+  // Restore recorded bans (if any — older matches may have none, which is
+  // fine; the Bans zones just stay empty and can be filled in from here).
+  const bans = match.bans || { player1: [], player2: [] };
+
   const p1Kits = match.picks
     ? match.picks.player1
     : match.games.filter((g) => g.pickedBy === "player1").map((g) => g.kit);
@@ -599,24 +1032,29 @@ function startEditMatch(id) {
     ? match.picks.decider
     : (match.games.find((g) => g.pickedBy === "decider") || {}).kit;
 
-  p1Kits.forEach((kit, i) => {
-    const sel = document.getElementById(`p1-pick-${i}`);
-    if (sel) sel.value = kit;
-  });
-  p2Kits.forEach((kit, i) => {
-    const sel = document.getElementById(`p2-pick-${i}`);
-    if (sel) sel.value = kit;
-  });
+  moveKitsToZone(bans.player1 || [], "p1-bans");
+  moveKitsToZone(bans.player2 || [], "p2-bans");
+  moveKitsToZone(p1Kits, "p1-picks");
+  moveKitsToZone(p2Kits, "p2-picks");
+  if (deciderKit) moveKitsToZone([deciderKit], "decider");
 
-  updatePickOptions();
-
-  const deciderEl = document.getElementById("decider-select");
-  if (deciderEl && deciderKit) deciderEl.value = deciderKit;
+  updateZoneStatus();
 
   currentPicks = { player1: p1Kits, player2: p2Kits, decider: deciderKit };
+  currentBans = {
+    player1: bans.player1 || [],
+    player2: bans.player2 || [],
+  };
+  currentBanOrder = combinedBanOrder(match);
   pendingGames = buildPlayOrder(match.format, p1Kits, p2Kits, deciderKit);
 
-  renderGamesSection(pendingGames, match.player1, match.player2);
+  renderGamesSection(
+    pendingGames,
+    match.player1,
+    match.player2,
+    currentBans,
+    currentBanOrder,
+  );
 
   pendingGames.forEach((pg, idx) => {
     const playedGame = match.games.find((g) => g.kit === pg.kit);
@@ -657,6 +1095,39 @@ function renderHistoryEventFilterOptions() {
 }
 
 historyEventFilter.addEventListener("change", renderMatchList);
+
+// A compact one-line summary of a match's recorded bans ("Player1 banned
+// Kit1, Kit2 • Player2 banned Kit3"), or "" if none were recorded — older
+// matches predate ban-tracking, so this is always optional.
+function bansSummaryHtml(match) {
+  const bans = match.bans || { player1: [], player2: [] };
+  const parts = [];
+  if (bans.player1 && bans.player1.length) {
+    parts.push(
+      `${escapeHtml(match.player1)} banned ${bans.player1.map((k) => escapeHtml(kitDisplayName(k))).join(", ")}`,
+    );
+  }
+  if (bans.player2 && bans.player2.length) {
+    parts.push(
+      `${escapeHtml(match.player2)} banned ${bans.player2.map((k) => escapeHtml(kitDisplayName(k))).join(", ")}`,
+    );
+  }
+  if (parts.length === 0) return "";
+  return `<div class="bans-summary">${parts.join(" • ")}</div>`;
+}
+
+// The true chronological ban order for a match, across both players —
+// matches saved since bans became reorderable store this directly as
+// banOrder; older matches (or ones where it's missing/stale) fall back to
+// player1's bans then player2's, the long-standing default order.
+function combinedBanOrder(match) {
+  const bans = match.bans || { player1: [], player2: [] };
+  const combined = [...(bans.player1 || []), ...(bans.player2 || [])];
+  if (match.banOrder && match.banOrder.length === combined.length) {
+    return match.banOrder;
+  }
+  return combined;
+}
 
 function renderMatchList() {
   const container = document.getElementById("match-list");
@@ -716,7 +1187,7 @@ function renderMatchList() {
             <button class="delete-btn" data-delete="${m.id}">Delete</button>
           </div>
         </div>
-        <div class="match-card-body">${gamesHtml}</div>
+        <div class="match-card-body">${bansSummaryHtml(m)}${gamesHtml}</div>
       </div>`;
     })
     .join("");
@@ -880,9 +1351,11 @@ function renderPlayerDetails(name) {
   const kitsInScope = kitsForEvent(eventFilter);
   const kitPickStats = {}; // kit -> { picked: n, won: n } — only games this player personally picked
   const kitOverallStats = {}; // kit -> { played: n, won: n } — every game this player played on that kit
+  const kitBanStats = {}; // kit -> { banned: n, bannedFirst: n } — this player's own recorded bans
   kitsInScope.forEach((k) => {
     kitPickStats[k] = { picked: 0, won: 0 };
     kitOverallStats[k] = { played: 0, won: 0 };
+    kitBanStats[k] = { banned: 0, bannedFirst: 0 };
   });
 
   const matchRows = playerMatches
@@ -905,6 +1378,17 @@ function renderPlayerDetails(name) {
           kitPickStats[g.kit].picked++;
           if (g.winner === myRole) kitPickStats[g.kit].won++;
         }
+      });
+
+      const bans = m.bans || { player1: [], player2: [] };
+      const myBans = isP1 ? bans.player1 || [] : bans.player2 || [];
+      // Each player's own first ban always counts as a "first ban" for
+      // their stats — both players' first bans count, not just whichever
+      // one happened first overall in the match.
+      myBans.forEach((kit, idx) => {
+        if (!kitBanStats[kit]) return; // skip unrecognized/out-of-scope kit values
+        kitBanStats[kit].banned++;
+        if (idx === 0) kitBanStats[kit].bannedFirst++;
       });
 
       const gameLines = m.games
@@ -936,7 +1420,7 @@ function renderPlayerDetails(name) {
         <td>${myKitWins} - ${oppKitWins}</td>
       </tr>
       <tr class="match-history-detail" data-detail-for="${m.id}">
-        <td colspan="${eventFilter === "all" ? 6 : 5}">${gameLines}</td>
+        <td colspan="${eventFilter === "all" ? 6 : 5}">${bansSummaryHtml(m)}${gameLines}</td>
       </tr>`;
     })
     .join("");
@@ -967,6 +1451,15 @@ function renderPlayerDetails(name) {
     </tr>`;
   }).join("");
 
+  const kitBanRows = kitsInScope.map((k) => {
+    const stat = kitBanStats[k];
+    return `<tr>
+      <td>${kitDisplayName(k)}</td>
+      <td>${stat.banned}</td>
+      <td>${stat.bannedFirst}</td>
+    </tr>`;
+  }).join("");
+
   container.innerHTML = `
     <div class="stat-cards">
       <div class="stat-box"><div class="value">${playerMatches.length}</div><div class="label">Matches</div></div>
@@ -985,6 +1478,12 @@ function renderPlayerDetails(name) {
     <table>
       <thead><tr><th>Kit</th><th>Times Picked</th><th>Times Won</th><th>Win Rate</th></tr></thead>
       <tbody>${kitRows}</tbody>
+    </table>
+
+    <h3>Kit Bans by ${escapeHtml(name)}</h3>
+    <table>
+      <thead><tr><th>Kit</th><th>Times Banned</th><th>Times Banned First</th></tr></thead>
+      <tbody>${kitBanRows}</tbody>
     </table>
 
     <h3>Match History</h3>
@@ -1228,7 +1727,7 @@ function headToHeadHtml(nameA, nameB) {
         <td>${aKitWins} - ${bKitWins}</td>
       </tr>
       <tr class="match-history-detail" data-detail-for="${m.id}">
-        <td colspan="5">${gameLines}</td>
+        <td colspan="5">${bansSummaryHtml(m)}${gameLines}</td>
       </tr>`;
     })
     .join("");
@@ -2088,7 +2587,7 @@ function openBracketDetailModal(matchId) {
     <div class="stat-cards">
       <div class="stat-box"><div class="value">${p1Wins} - ${p2Wins}</div><div class="label">Kit Score</div></div>
     </div>
-    <div class="match-card-body open">${gameRows}</div>
+    <div class="match-card-body open">${bansSummaryHtml(match)}${gameRows}</div>
   `;
   bracketDetailModal.hidden = false;
 }
