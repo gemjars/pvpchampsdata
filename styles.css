@@ -494,6 +494,22 @@ button:disabled {
   border-bottom: none;
 }
 
+.kit-breakdown-line {
+  padding: 6px 0;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.kit-breakdown-line strong {
+  color: var(--text);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.kit-breakdown-line.empty-state {
+  padding: 6px 0;
+}
+
 .bans-summary {
   font-size: 0.8rem;
   color: var(--text-dim);
@@ -793,6 +809,32 @@ th {
   padding-bottom: 10px;
   margin-top: 10px;
   cursor: grab;
+}
+
+#placement-list {
+  margin-top: 16px;
+}
+
+#placement-list table {
+  width: 100%;
+}
+
+#placement-list th {
+  white-space: nowrap;
+}
+
+.placement-rank {
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  width: 1%;
+}
+
+.placement-round {
+  color: var(--text-mute);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  width: 1%;
 }
 
 .bracket-scroll.panning {

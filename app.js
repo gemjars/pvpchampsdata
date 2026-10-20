@@ -70,6 +70,58 @@ function roundSortIndex(round) {
   return idx === -1 ? ROUND_ORDER.length : idx;
 }
 
+// Rounds (in chronological elimination order) whose LOSER is eliminated
+// from the bracket outright — every lower-bracket round, plus the Grand
+// Final (whose winner is champion and whose loser takes 2nd). Losing an
+// upper-bracket round just drops you into the lower bracket instead of
+// eliminating you, so those rounds are deliberately excluded — used by
+// the Placement tab.
+const ELIMINATION_ROUNDS = ROUND_DEFINITIONS.filter(
+  (r) => r.section === "lower" || r.section === "grandFinal",
+).map((r) => r.value);
+
+// Precomputed { round -> {rankStart, rankEnd} } (or, for the Grand Final,
+// {winnerRank, loserRank}) describing which finishing position(s) a round
+// determines — based on the bracket's fixed 16-player structure (how many
+// players that round eliminates), not on how many of its matches have
+// actually been played. Built once by walking the elimination rounds from
+// the Grand Final backwards to Lower Round 1, since 1st place is decided
+// last chronologically but numbered first.
+const ROUND_PLACEMENT_TIERS = (() => {
+  const tiers = {};
+  let nextRank = 1;
+  [...ELIMINATION_ROUNDS].reverse().forEach((round) => {
+    if (round === "Grand Final") {
+      tiers[round] = { winnerRank: nextRank, loserRank: nextRank + 1 };
+      nextRank += 2;
+      return;
+    }
+    const def = ROUND_DEFINITIONS.find((r) => r.value === round);
+    const count = def ? def.slots.length : 1;
+    tiers[round] = { rankStart: nextRank, rankEnd: nextRank + count - 1 };
+    nextRank += count;
+  });
+  return tiers;
+})();
+
+// "1st", "2nd", "3rd", "4th", "11th", "12th", "13th", ... — the English
+// ordinal suffix rules, including the 11/12/13 exceptions.
+function ordinal(n) {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  const rem10 = n % 10;
+  if (rem10 === 1) return `${n}st`;
+  if (rem10 === 2) return `${n}nd`;
+  if (rem10 === 3) return `${n}rd`;
+  return `${n}th`;
+}
+
+function placementLabel(rankStart, rankEnd) {
+  return rankStart === rankEnd
+    ? ordinal(rankStart)
+    : `${ordinal(rankStart)} - ${ordinal(rankEnd)}`;
+}
+
 // Orders matches the way they played out: by round (see ROUND_ORDER), then
 // chronologically (oldest first) within a round. Shared by the Match
 // History list and the Comparison tab's head-to-head history.
@@ -1325,6 +1377,73 @@ playerSelect.addEventListener("change", () => {
   renderPlayerDetails(playerSelect.value);
 });
 
+// Turns a { opponent -> count } map into a compact "PlayerA, PlayerB x2"
+// list — sorted by highest count first, then alphabetically — or "—" if
+// empty. Shared by all three kit breakdown lists below.
+function opponentCountListHtml(countsByOpponent) {
+  const entries = Object.entries(countsByOpponent).sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+  );
+  if (entries.length === 0) return "—";
+  return entries
+    .map(([name, count]) =>
+      count > 1 ? `${escapeHtml(name)} x${count}` : escapeHtml(name),
+    )
+    .join(", ");
+}
+
+// Turns a kit's { opponent -> { played, won } } breakdown into the two
+// expandable summary lines shown under "Overall Win Rate by Kit": who it
+// beat, and who it lost to (each opponent listed once, with an "xN" count
+// if there was more than one).
+function overallBreakdownHtml(byOpponent) {
+  if (Object.keys(byOpponent).length === 0) {
+    return `<div class="kit-breakdown-line empty-state">No games played on this kit</div>`;
+  }
+  const wins = {};
+  const losses = {};
+  Object.entries(byOpponent).forEach(([opponent, s]) => {
+    if (s.won > 0) wins[opponent] = s.won;
+    if (s.played - s.won > 0) losses[opponent] = s.played - s.won;
+  });
+  return `<div class="kit-breakdown-line"><strong>Wins:</strong> ${opponentCountListHtml(wins)}</div>
+    <div class="kit-breakdown-line"><strong>Losses:</strong> ${opponentCountListHtml(losses)}</div>`;
+}
+
+// Turns a kit's { opponent -> { picked, won } } breakdown into the two
+// expandable summary lines shown under "Kit Picks": who it beat, and who
+// it lost to, when personally picked.
+function pickBreakdownHtml(byOpponent) {
+  if (Object.keys(byOpponent).length === 0) {
+    return `<div class="kit-breakdown-line empty-state">Never picked</div>`;
+  }
+  const wins = {};
+  const losses = {};
+  Object.entries(byOpponent).forEach(([opponent, s]) => {
+    if (s.won > 0) wins[opponent] = s.won;
+    if (s.picked - s.won > 0) losses[opponent] = s.picked - s.won;
+  });
+  return `<div class="kit-breakdown-line"><strong>Wins:</strong> ${opponentCountListHtml(wins)}</div>
+    <div class="kit-breakdown-line"><strong>Losses:</strong> ${opponentCountListHtml(losses)}</div>`;
+}
+
+// Turns a kit's { opponent -> { banned, bannedFirst } } breakdown into the
+// two expandable summary lines shown under "Kit Bans": who it was banned
+// against, and who it was banned against first.
+function banBreakdownHtml(byOpponent) {
+  if (Object.keys(byOpponent).length === 0) {
+    return `<div class="kit-breakdown-line empty-state">Never banned</div>`;
+  }
+  const banned = {};
+  const bannedFirst = {};
+  Object.entries(byOpponent).forEach(([opponent, s]) => {
+    if (s.banned > 0) banned[opponent] = s.banned;
+    if (s.bannedFirst > 0) bannedFirst[opponent] = s.bannedFirst;
+  });
+  return `<div class="kit-breakdown-line"><strong>Banned:</strong> ${opponentCountListHtml(banned)}</div>
+    <div class="kit-breakdown-line"><strong>Banned first:</strong> ${opponentCountListHtml(bannedFirst)}</div>`;
+}
+
 function renderPlayerDetails(name) {
   const container = document.getElementById("player-details");
   if (!name) {
@@ -1352,10 +1471,16 @@ function renderPlayerDetails(name) {
   const kitPickStats = {}; // kit -> { picked: n, won: n } — only games this player personally picked
   const kitOverallStats = {}; // kit -> { played: n, won: n } — every game this player played on that kit
   const kitBanStats = {}; // kit -> { banned: n, bannedFirst: n } — this player's own recorded bans
+  const kitOverallByOpponent = {}; // kit -> { opponent -> { played, won } }
+  const kitPickByOpponent = {}; // kit -> { opponent -> { picked, won } }
+  const kitBanByOpponent = {}; // kit -> { opponent -> { banned, bannedFirst } }
   kitsInScope.forEach((k) => {
     kitPickStats[k] = { picked: 0, won: 0 };
     kitOverallStats[k] = { played: 0, won: 0 };
     kitBanStats[k] = { banned: 0, bannedFirst: 0 };
+    kitOverallByOpponent[k] = {};
+    kitPickByOpponent[k] = {};
+    kitBanByOpponent[k] = {};
   });
 
   const matchRows = playerMatches
@@ -1374,9 +1499,21 @@ function renderPlayerDetails(name) {
         kitOverallStats[g.kit].played++;
         if (g.winner === myRole) kitOverallStats[g.kit].won++;
 
+        const ob =
+          kitOverallByOpponent[g.kit][opponent] ||
+          (kitOverallByOpponent[g.kit][opponent] = { played: 0, won: 0 });
+        ob.played++;
+        if (g.winner === myRole) ob.won++;
+
         if (g.pickedBy === myRole) {
           kitPickStats[g.kit].picked++;
           if (g.winner === myRole) kitPickStats[g.kit].won++;
+
+          const pb =
+            kitPickByOpponent[g.kit][opponent] ||
+            (kitPickByOpponent[g.kit][opponent] = { picked: 0, won: 0 });
+          pb.picked++;
+          if (g.winner === myRole) pb.won++;
         }
       });
 
@@ -1389,6 +1526,12 @@ function renderPlayerDetails(name) {
         if (!kitBanStats[kit]) return; // skip unrecognized/out-of-scope kit values
         kitBanStats[kit].banned++;
         if (idx === 0) kitBanStats[kit].bannedFirst++;
+
+        const bb =
+          kitBanByOpponent[kit][opponent] ||
+          (kitBanByOpponent[kit][opponent] = { banned: 0, bannedFirst: 0 });
+        bb.banned++;
+        if (idx === 0) bb.bannedFirst++;
       });
 
       const gameLines = m.games
@@ -1432,31 +1575,40 @@ function renderPlayerDetails(name) {
   const kitRows = kitsInScope.map((k) => {
     const stat = kitPickStats[k];
     const rate = stat.picked ? Math.round((stat.won / stat.picked) * 100) : 0;
-    return `<tr>
+    return `<tr class="match-history-row" data-history-id="pick-${escapeHtml(k)}">
       <td>${kitDisplayName(k)}</td>
       <td>${stat.picked}</td>
       <td>${stat.won}</td>
       <td>${stat.picked ? rate + "%" : "—"}</td>
+    </tr>
+    <tr class="match-history-detail" data-detail-for="pick-${escapeHtml(k)}">
+      <td colspan="4">${pickBreakdownHtml(kitPickByOpponent[k])}</td>
     </tr>`;
   }).join("");
 
   const kitOverallRows = kitsInScope.map((k) => {
     const stat = kitOverallStats[k];
     const rate = stat.played ? Math.round((stat.won / stat.played) * 100) : 0;
-    return `<tr>
+    return `<tr class="match-history-row" data-history-id="overall-${escapeHtml(k)}">
       <td>${kitDisplayName(k)}</td>
       <td>${stat.played}</td>
       <td>${stat.won}</td>
       <td>${stat.played ? rate + "%" : "—"}</td>
+    </tr>
+    <tr class="match-history-detail" data-detail-for="overall-${escapeHtml(k)}">
+      <td colspan="4">${overallBreakdownHtml(kitOverallByOpponent[k])}</td>
     </tr>`;
   }).join("");
 
   const kitBanRows = kitsInScope.map((k) => {
     const stat = kitBanStats[k];
-    return `<tr>
+    return `<tr class="match-history-row" data-history-id="ban-${escapeHtml(k)}">
       <td>${kitDisplayName(k)}</td>
       <td>${stat.banned}</td>
       <td>${stat.bannedFirst}</td>
+    </tr>
+    <tr class="match-history-detail" data-detail-for="ban-${escapeHtml(k)}">
+      <td colspan="3">${banBreakdownHtml(kitBanByOpponent[k])}</td>
     </tr>`;
   }).join("");
 
@@ -1543,7 +1695,8 @@ function renderKitStats() {
     (k) =>
       (stats[k] = {
         totalGames: 0,
-        deciderCount: 0,
+        deciderCount: 0, // decider actually needed and played
+        selectedAsDecider: 0, // decider chosen for the match, whether or not it was ultimately played
         pickerWins: 0,
         pickerGames: 0,
         pickers: {},
@@ -1551,6 +1704,13 @@ function renderKitStats() {
   );
 
   filteredMatches.forEach((m) => {
+    const deciderKit = m.picks
+      ? m.picks.decider
+      : (m.games.find((g) => g.pickedBy === "decider") || {}).kit;
+    if (deciderKit && stats[deciderKit]) {
+      stats[deciderKit].selectedAsDecider++;
+    }
+
     m.games.forEach((g) => {
       const s = stats[g.kit];
       if (!s) return; // skip unrecognized/legacy kit values
@@ -1588,8 +1748,8 @@ function renderKitStats() {
       return `<div class="kit-card">
         <h3>${kitDisplayName(k)}</h3>
         <div class="row"><span>Total games played</span><span>${s.totalGames}</span></div>
-        <div class="row"><span>Times picked (by a player)</span><span>${s.pickerGames}</span></div>
-        <div class="row"><span>Times used as decider</span><span>${s.deciderCount}</span></div>
+        <div class="row"><span>Times picked</span><span>${s.pickerGames}</span></div>
+        <div class="row"><span>Picked as decider (seen)</span><span>${s.selectedAsDecider} (${s.deciderCount})</span></div>
         <div class="row"><span>Picker win rate</span><span>${s.pickerGames ? pickerWinRate + "%" : "—"}</span></div>
         <div class="picker-list">
           <strong>Picked by:</strong>
@@ -2114,6 +2274,7 @@ function renderAll() {
   renderComparisonDropdowns();
   renderComparisonStats();
   renderBracket();
+  renderPlacement();
 }
 
 async function init() {
@@ -2403,6 +2564,127 @@ function renderBracket() {
   );
   attachBracketMatchListeners();
   requestAnimationFrame(drawBracketLines);
+}
+
+// ---------- Placement Tab ----------
+let activePlacementEvent = EVENTS[0];
+
+function renderPlacementEventTabs() {
+  const container = document.getElementById("placement-event-tabs");
+  if (!container) return;
+  container.innerHTML = EVENTS.map(
+    (ev) =>
+      `<button type="button" class="bracket-event-tab${ev === activePlacementEvent ? " active" : ""}" data-event="${escapeHtml(ev)}">${escapeHtml(ev)}</button>`,
+  ).join("");
+
+  container.querySelectorAll(".bracket-event-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.event === activePlacementEvent) return;
+      activePlacementEvent = btn.dataset.event;
+      renderPlacement();
+    });
+  });
+}
+
+// Computes each player's final placement for one event's bracket, purely
+// from recorded match results — there's no separate standings data to
+// maintain, it's always derived fresh. Returns:
+//   tiers: every placement group with at least one player, best-to-worst,
+//     as { rankStart, rankEnd, round, players: [names] } — a tier holds
+//     more than one player when they were eliminated in the same round.
+//   stillCompeting: players seen in this event's matches who haven't been
+//     eliminated yet (including an as-yet-undetermined champion), sorted
+//     alphabetically.
+function computePlacements(event) {
+  const eventMatches = matches.filter(
+    (m) => (m.event || "Champs 1") === event,
+  );
+
+  const allPlayers = new Set();
+  eventMatches.forEach((m) => {
+    allPlayers.add(m.player1);
+    allPlayers.add(m.player2);
+  });
+
+  const placedPlayers = new Set();
+  const byTierKey = {}; // "rankStart-rankEnd" -> { rankStart, rankEnd, round, players }
+
+  function place(name, rankStart, rankEnd, round) {
+    if (placedPlayers.has(name)) return; // already placed via another match — keep it unambiguous
+    placedPlayers.add(name);
+    const key = `${rankStart}-${rankEnd}`;
+    if (!byTierKey[key]) {
+      byTierKey[key] = { rankStart, rankEnd, round, players: [] };
+    }
+    byTierKey[key].players.push(name);
+  }
+
+  ELIMINATION_ROUNDS.forEach((round) => {
+    const roundMatches = eventMatches.filter((m) => m.round === round);
+    if (roundMatches.length === 0) return;
+    const tier = ROUND_PLACEMENT_TIERS[round];
+
+    if (round === "Grand Final") {
+      roundMatches.forEach((m) => {
+        const winnerName = m.winner === "player1" ? m.player1 : m.player2;
+        const loserName = m.winner === "player1" ? m.player2 : m.player1;
+        place(winnerName, tier.winnerRank, tier.winnerRank, round);
+        place(loserName, tier.loserRank, tier.loserRank, round);
+      });
+      return;
+    }
+
+    roundMatches.forEach((m) => {
+      const loserName = m.winner === "player1" ? m.player2 : m.player1;
+      place(loserName, tier.rankStart, tier.rankEnd, round);
+    });
+  });
+
+  const tiers = Object.values(byTierKey).sort(
+    (a, b) => a.rankStart - b.rankStart,
+  );
+  const stillCompeting = [...allPlayers]
+    .filter((p) => !placedPlayers.has(p))
+    .sort((a, b) => a.localeCompare(b));
+
+  return { tiers, stillCompeting };
+}
+
+function renderPlacement() {
+  renderPlacementEventTabs();
+  const container = document.getElementById("placement-list");
+  if (!container) return;
+
+  const { tiers, stillCompeting } = computePlacements(activePlacementEvent);
+
+  if (tiers.length === 0) {
+    container.innerHTML = `<p class="empty-state">No matches recorded yet for ${escapeHtml(activePlacementEvent)}.</p>`;
+    return;
+  }
+
+  const rows = tiers
+    .map((t) => {
+      const eliminatedInLabel =
+        t.rankStart === 1 ? "Winner" : escapeHtml(roundLabel(t.round));
+      return `<tr>
+        <td class="placement-rank">${placementLabel(t.rankStart, t.rankEnd)}</td>
+        <td>${t.players.map((p) => escapeHtml(p)).join(", ")}</td>
+        <td class="placement-round">${eliminatedInLabel}</td>
+      </tr>`;
+    })
+    .join("");
+
+  const stillCompetingHtml = stillCompeting.length
+    ? `<p class="hint">Still competing (not yet eliminated): ${stillCompeting.map((p) => escapeHtml(p)).join(", ")}</p>`
+    : "";
+
+  container.innerHTML = `
+    <table>
+      <thead><tr><th>Placement</th><th>Player(s)</th><th>Eliminated In</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${stillCompetingHtml}
+  `;
 }
 
 function attachBracketMatchListeners() {
