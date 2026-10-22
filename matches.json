@@ -1,0 +1,2813 @@
+[
+  {
+    "id": "1785252726575-jkbnx7",
+    "round": "1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "MyDogIsConfused",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "DSMP"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252766208-dt9aeq",
+    "round": "1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "BLMcheat",
+    "player2": "mikagoated",
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 2,
+        "score2": 3,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785252824102-7nk0rg",
+    "round": "1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "ImMixed",
+    "player2": "TheobaldTheBird",
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Sword"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 3,
+        "winner": "player2"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "decider",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252862693-xw6g3l",
+    "round": "1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "TungTungTungkiks",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252894526-lkrywr",
+    "round": "1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "DarkKnightAragon",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "DSMP"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252934035-rzyhwc",
+    "round": "1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "JACKS5ON",
+    "player2": "sweatgod",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 1,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785252976745-zz2p69",
+    "round": "1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "SpawnPlayer",
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Sword"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player2",
+        "score1": 3,
+        "score2": 1,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253013088-zcnetl",
+    "round": "1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Sizierung",
+    "player2": "Ricardoxx_",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253062862-12neaq",
+    "round": "LB1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "BLMcheat",
+    "player2": "MyDogIsConfused",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253111159-lmkry3",
+    "round": "LB1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "TungTungTungkiks",
+    "player2": "TheobaldTheBird",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253140287-976wvx",
+    "round": "LB1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "sweatgod",
+    "player2": "DarkKnightAragon",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "DSMP"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253176119-lkandv",
+    "round": "LB1",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Ricardoxx_",
+    "player2": "SpawnPlayer",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253202244-eqs8lm",
+    "round": "2",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "mikagoated",
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253257078-0leo30",
+    "round": "2",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "ImMixed",
+    "player2": "ninorc15",
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "Sword"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player2",
+        "score1": 3,
+        "score2": 2,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253290169-e0pnrj",
+    "round": "2",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "JACKS5ON",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Sword"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player2",
+        "score1": 3,
+        "score2": 2,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253339037-06rk64",
+    "round": "2",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "Sizierung",
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253381049-fxrtij",
+    "round": "LB2",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Sizierung",
+    "player2": "BLMcheat",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "DSMP"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253427356-o95q3d",
+    "round": "LB2",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "JACKS5ON",
+    "player2": "TungTungTungkiks",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253460683-d8pvqh",
+    "round": "LB2",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "sweatgod",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253503149-ae4xu0",
+    "round": "LB2",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "mikagoated",
+    "player2": "Ricardoxx_",
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253535490-cauz6x",
+    "round": "3",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "ImMixed",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253566980-hwgkpa",
+    "round": "3",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "Freekee_Fang",
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "DSMP"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253597399-a96kpx",
+    "round": "LB3",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "JACKS5ON",
+    "player2": "BLMcheat",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253644215-3bhdoc",
+    "round": "LB3",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "Ricardoxx_",
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253684324-g3bf8m",
+    "round": "LB4",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "ImMixed",
+    "player2": "BLMcheat",
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253712311-0wh85h",
+    "round": "LB4",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "Ricardoxx_",
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253759920-mnesh4",
+    "round": "LB5",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "ImMixed",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 3,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253802990-kzrjrg",
+    "round": "Upper Final",
+    "event": "Champs 1",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "Swight",
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1785253870252-j9pjd1",
+    "round": "Lower Final",
+    "event": "Champs 1",
+    "format": "bo5",
+    "player1": "Swight",
+    "player2": "ImMixed",
+    "picks": {
+      "player1": [
+        "UHC",
+        "Sword"
+      ],
+      "player2": [
+        "Cart",
+        "DSMP"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 2,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1785253905222-54yd74",
+    "round": "Grand Final",
+    "event": "Champs 1",
+    "format": "grandfinal",
+    "player1": "coldified",
+    "player2": "ImMixed",
+    "picks": {
+      "player1": [
+        "UHC",
+        "Sword",
+        "DSMP"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792421945497-jshpf5",
+    "event": "Champs 2",
+    "round": "1",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "sweatgod",
+    "bans": {
+      "player1": [
+        "Cart",
+        "Sword"
+      ],
+      "player2": [
+        "Crystal",
+        "DSMP"
+      ]
+    },
+    "banOrder": [
+      "Cart",
+      "Crystal",
+      "Sword",
+      "DSMP"
+    ],
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "Dia Pot"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792422061222-0hzo2a",
+    "event": "Champs 2",
+    "round": "1",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "ImMixed",
+    "bans": {
+      "player1": [
+        "Spear",
+        "UHC"
+      ],
+      "player2": [
+        "Sword",
+        "Dia Pot"
+      ]
+    },
+    "banOrder": [
+      "Spear",
+      "Sword",
+      "UHC",
+      "Dia Pot"
+    ],
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Crystal"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1792422211933-m2xefo",
+    "event": "Champs 2",
+    "round": "1",
+    "format": "bo3",
+    "player1": "mikagoated",
+    "player2": "ymiau",
+    "bans": {
+      "player1": [
+        "DSMP",
+        "Sword"
+      ],
+      "player2": [
+        "Crystal",
+        "Spear"
+      ]
+    },
+    "banOrder": [
+      "DSMP",
+      "Crystal",
+      "Sword",
+      "Spear"
+    ],
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Dia Pot"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "decider",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792422291778-hnav4h",
+    "event": "Champs 2",
+    "round": "1",
+    "format": "bo3",
+    "player1": "BLMcheat",
+    "player2": "x_kyran_x",
+    "bans": {
+      "player1": [
+        "Crystal",
+        "Spear"
+      ],
+      "player2": [
+        "UHC",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "UHC",
+      "Crystal",
+      "Sword",
+      "Spear"
+    ],
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Dia Pot"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792422535079-itakdn",
+    "event": "Champs 2",
+    "round": "1",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "ZeNain",
+    "bans": {
+      "player1": [
+        "Crystal",
+        "Cart"
+      ],
+      "player2": [
+        "DSMP",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "DSMP",
+      "Crystal",
+      "Sword",
+      "Cart"
+    ],
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Dia Pot"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 1,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792422716612-l4slw2",
+    "event": "Champs 2",
+    "round": "1",
+    "format": "bo3",
+    "player1": "Flowtives",
+    "player2": "ItzTwilighttt",
+    "bans": {
+      "player1": [
+        "Sword",
+        "UHC"
+      ],
+      "player2": [
+        "DSMP",
+        "Dia Pot"
+      ]
+    },
+    "banOrder": [
+      "Sword",
+      "DSMP",
+      "Dia Pot",
+      "UHC"
+    ],
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "Crystal"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Crystal",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792423294701-cwsaxs",
+    "event": "Champs 2",
+    "round": "1",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "Alepordio",
+    "bans": {
+      "player1": [
+        "Spear",
+        "Cart"
+      ],
+      "player2": [
+        "Crystal",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "Crystal",
+      "Spear",
+      "Sword",
+      "Cart"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792423450046-wt9uoq",
+    "event": "Champs 2",
+    "round": "1",
+    "format": "bo3",
+    "player1": "c0rzz",
+    "player2": "BlvckWlf",
+    "bans": {
+      "player1": [
+        "Spear",
+        "Sword"
+      ],
+      "player2": [
+        "Crystal",
+        "Cart"
+      ]
+    },
+    "banOrder": [
+      "Spear",
+      "Crystal",
+      "Sword",
+      "Cart"
+    ],
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Dia Pot"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792423609156-afojln",
+    "event": "Champs 2",
+    "round": "LB1",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "sweatgod",
+    "bans": {
+      "player1": [
+        "UHC",
+        "Sword"
+      ],
+      "player2": [
+        "Crystal",
+        "Cart"
+      ]
+    },
+    "banOrder": [
+      "UHC",
+      "Crystal",
+      "Sword",
+      "Cart"
+    ],
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Dia Pot"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792423870319-jqxf2u",
+    "event": "Champs 2",
+    "round": "LB1",
+    "format": "bo3",
+    "player1": "x_kyran_x",
+    "player2": "ymiau",
+    "bans": {
+      "player1": [
+        "UHC",
+        "Sword"
+      ],
+      "player2": [
+        "Crystal",
+        "Spear"
+      ]
+    },
+    "banOrder": [
+      "Crystal",
+      "UHC",
+      "Sword",
+      "Spear"
+    ],
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "DSMP"
+      ],
+      "decider": "Dia Pot"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "decider",
+        "score1": 2,
+        "score2": 1,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792424080977-3pejmw",
+    "event": "Champs 2",
+    "round": "LB1",
+    "format": "bo3",
+    "player1": "ItzTwilighttt",
+    "player2": "ZeNain",
+    "bans": {
+      "player1": [
+        "Sword",
+        "Crystal"
+      ],
+      "player2": [
+        "Spear",
+        "Cart"
+      ]
+    },
+    "banOrder": [
+      "Spear",
+      "Sword",
+      "Cart",
+      "Crystal"
+    ],
+    "picks": {
+      "player1": [
+        "DSMP"
+      ],
+      "player2": [
+        "Dia Pot"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1792424583396-06wsnv",
+    "event": "Champs 2",
+    "round": "LB1",
+    "format": "bo3",
+    "player1": "BlvckWlf",
+    "player2": "Alepordio",
+    "bans": {
+      "player1": [
+        "DSMP",
+        "Sword"
+      ],
+      "player2": [
+        "Crystal",
+        "Dia Pot"
+      ]
+    },
+    "banOrder": [
+      "DSMP",
+      "Crystal",
+      "Sword",
+      "Dia Pot"
+    ],
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "UHC"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "decider",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792425240956-nq4cva",
+    "event": "Champs 2",
+    "round": "2",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "ImMixed",
+    "bans": {
+      "player1": [
+        "Cart",
+        "DSMP"
+      ],
+      "player2": [
+        "UHC",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "Cart",
+      "UHC",
+      "DSMP",
+      "Sword"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "Crystal"
+    },
+    "games": [
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Crystal",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1792425402897-bfpf8q",
+    "event": "Champs 2",
+    "round": "2",
+    "format": "bo3",
+    "player1": "mikagoated",
+    "player2": "BLMcheat",
+    "bans": {
+      "player1": [
+        "DSMP",
+        "Sword"
+      ],
+      "player2": [
+        "Crystal",
+        "Spear"
+      ]
+    },
+    "banOrder": [
+      "DSMP",
+      "Crystal",
+      "Sword",
+      "Spear"
+    ],
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Dia Pot"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 1,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792425527585-9zhprz",
+    "event": "Champs 2",
+    "round": "2",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "Flowtives",
+    "bans": {
+      "player1": [
+        "Cart",
+        "UHC"
+      ],
+      "player2": [
+        "Sword",
+        "DSMP"
+      ]
+    },
+    "banOrder": [
+      "Sword",
+      "Cart",
+      "DSMP",
+      "UHC"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "Crystal"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "Crystal",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792425556992-aeto9n",
+    "event": "Champs 2",
+    "round": "2",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "c0rzz",
+    "bans": {
+      "player1": [
+        "Crystal",
+        "DSMP"
+      ],
+      "player2": [
+        "Dia Pot",
+        "Cart"
+      ]
+    },
+    "banOrder": [
+      "Dia Pot",
+      "Crystal",
+      "Cart",
+      "DSMP"
+    ],
+    "picks": {
+      "player1": [
+        "Sword"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 1,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1792425945142-lom0xq",
+    "event": "Champs 2",
+    "round": "LB2",
+    "format": "bo3",
+    "player1": "ninorc15",
+    "player2": "Freekee_Fang",
+    "bans": {
+      "player1": [
+        "Spear",
+        "Crystal"
+      ],
+      "player2": [
+        "UHC",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "UHC",
+      "Spear",
+      "Sword",
+      "Crystal"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "DSMP"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1792426088903-faj190",
+    "event": "Champs 2",
+    "round": "LB2",
+    "format": "bo3",
+    "player1": "Flowtives",
+    "player2": "x_kyran_x",
+    "bans": {
+      "player1": [
+        "Crystal",
+        "Dia Pot"
+      ],
+      "player2": [
+        "UHC",
+        "DSMP"
+      ]
+    },
+    "banOrder": [
+      "Crystal",
+      "UHC",
+      "Dia Pot",
+      "DSMP"
+    ],
+    "picks": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 3,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1792426259668-dn5mv0",
+    "event": "Champs 2",
+    "round": "LB2",
+    "format": "bo3",
+    "player1": "BLMcheat",
+    "player2": "ZeNain",
+    "bans": {
+      "player1": [
+        "Crystal",
+        "Sword"
+      ],
+      "player2": [
+        "DSMP",
+        "Spear"
+      ]
+    },
+    "banOrder": [
+      "DSMP",
+      "Crystal",
+      "Spear",
+      "Sword"
+    ],
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Dia Pot"
+    },
+    "games": [
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792426354787-2k7yei",
+    "event": "Champs 2",
+    "round": "LB2",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "BlvckWlf",
+    "bans": {
+      "player1": [
+        "Sword",
+        "Spear"
+      ],
+      "player2": [
+        "Crystal",
+        "Cart"
+      ]
+    },
+    "banOrder": [
+      "Crystal",
+      "Sword",
+      "Cart",
+      "Spear"
+    ],
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Dia Pot"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792426613860-bj4tzy",
+    "event": "Champs 2",
+    "round": "3",
+    "format": "bo3",
+    "player1": "mikagoated",
+    "player2": "ImMixed",
+    "bans": {
+      "player1": [
+        "Spear",
+        "DSMP"
+      ],
+      "player2": [
+        "UHC",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "Spear",
+      "UHC",
+      "DSMP",
+      "Sword"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Crystal"
+    },
+    "games": [
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1792426855253-9dygwg",
+    "event": "Champs 2",
+    "round": "3",
+    "format": "bo3",
+    "player1": "coldified",
+    "player2": "c0rzz",
+    "bans": {
+      "player1": [
+        "UHC",
+        "Cart"
+      ],
+      "player2": [
+        "Sword",
+        "Spear"
+      ]
+    },
+    "banOrder": [
+      "Sword",
+      "UHC",
+      "Spear",
+      "Cart"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "Crystal"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Crystal",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792426997026-ipzbfz",
+    "event": "Champs 2",
+    "round": "LB3",
+    "format": "bo3",
+    "player1": "Freekee_Fang",
+    "player2": "x_kyran_x",
+    "bans": {
+      "player1": [
+        "Crystal",
+        "Spear"
+      ],
+      "player2": [
+        "DSMP",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "Crystal",
+      "DSMP",
+      "Spear",
+      "Sword"
+    ],
+    "picks": {
+      "player1": [
+        "UHC"
+      ],
+      "player2": [
+        "Cart"
+      ],
+      "decider": "Dia Pot"
+    },
+    "games": [
+      {
+        "kit": "UHC",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "decider",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792427094370-rhxf5s",
+    "event": "Champs 2",
+    "round": "LB3",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "BLMcheat",
+    "bans": {
+      "player1": [
+        "DSMP",
+        "Cart"
+      ],
+      "player2": [
+        "Crystal",
+        "Dia Pot"
+      ]
+    },
+    "banOrder": [
+      "DSMP",
+      "Crystal",
+      "Cart",
+      "Dia Pot"
+    ],
+    "picks": {
+      "player1": [
+        "Spear"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "Sword"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792432797437-uja89a",
+    "event": "Champs 2",
+    "round": "LB4",
+    "format": "bo3",
+    "player1": "mikagoated",
+    "player2": "Freekee_Fang",
+    "bans": {
+      "player1": [
+        "DSMP",
+        "Crystal"
+      ],
+      "player2": [
+        "UHC",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "UHC",
+      "DSMP",
+      "Sword",
+      "Crystal"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "Spear"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 1,
+        "winner": "player1"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      }
+    ],
+    "winner": "player2"
+  },
+  {
+    "id": "1792432938417-zrh32l",
+    "event": "Champs 2",
+    "round": "LB4",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "c0rzz",
+    "bans": {
+      "player1": [
+        "Crystal",
+        "Cart"
+      ],
+      "player2": [
+        "Spear",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "Crystal",
+      "Spear",
+      "Cart",
+      "Sword"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "UHC"
+      ],
+      "decider": "DSMP"
+    },
+    "games": [
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "UHC",
+        "pickedBy": "player2",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792433105988-1aawf7",
+    "event": "Champs 2",
+    "round": "Upper Final",
+    "format": "bo5",
+    "player1": "coldified",
+    "player2": "ImMixed",
+    "bans": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "UHC"
+      ]
+    },
+    "banOrder": [
+      "Cart",
+      "UHC"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot",
+        "Sword"
+      ],
+      "player2": [
+        "Spear",
+        "DSMP"
+      ],
+      "decider": "Crystal"
+    },
+    "games": [
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 0,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 2,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Crystal",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792433314352-7n8zft",
+    "event": "Champs 2",
+    "round": "LB5",
+    "format": "bo3",
+    "player1": "Swight",
+    "player2": "Freekee_Fang",
+    "bans": {
+      "player1": [
+        "Cart",
+        "Crystal"
+      ],
+      "player2": [
+        "UHC",
+        "Sword"
+      ]
+    },
+    "banOrder": [
+      "Cart",
+      "UHC",
+      "Crystal",
+      "Sword"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot"
+      ],
+      "player2": [
+        "DSMP"
+      ],
+      "decider": "Spear"
+    },
+    "games": [
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792433478952-ztnpyv",
+    "event": "Champs 2",
+    "round": "Lower Final",
+    "format": "bo5",
+    "player1": "Swight",
+    "player2": "ImMixed",
+    "bans": {
+      "player1": [
+        "Cart"
+      ],
+      "player2": [
+        "UHC"
+      ]
+    },
+    "banOrder": [
+      "Cart",
+      "UHC"
+    ],
+    "picks": {
+      "player1": [
+        "Dia Pot",
+        "Sword"
+      ],
+      "player2": [
+        "Spear",
+        "DSMP"
+      ],
+      "decider": "Crystal"
+    },
+    "games": [
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 2,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 2,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Crystal",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  },
+  {
+    "id": "1792441394681-dra1te",
+    "event": "Champs 2",
+    "round": "Grand Final",
+    "format": "grandfinal",
+    "player1": "coldified",
+    "player2": "Swight",
+    "bans": {
+      "player1": [
+        "UHC",
+        "Crystal"
+      ],
+      "player2": []
+    },
+    "banOrder": [
+      "UHC",
+      "Crystal"
+    ],
+    "picks": {
+      "player1": [
+        "Sword",
+        "Dia Pot"
+      ],
+      "player2": [
+        "Spear",
+        "DSMP"
+      ],
+      "decider": "Cart"
+    },
+    "games": [
+      {
+        "kit": "Spear",
+        "pickedBy": "player2",
+        "score1": 0,
+        "score2": 1,
+        "winner": "player2"
+      },
+      {
+        "kit": "Sword",
+        "pickedBy": "player1",
+        "score1": 3,
+        "score2": 1,
+        "winner": "player1"
+      },
+      {
+        "kit": "DSMP",
+        "pickedBy": "player2",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      },
+      {
+        "kit": "Dia Pot",
+        "pickedBy": "player1",
+        "score1": 1,
+        "score2": 2,
+        "winner": "player2"
+      },
+      {
+        "kit": "Cart",
+        "pickedBy": "decider",
+        "score1": 1,
+        "score2": 0,
+        "winner": "player1"
+      }
+    ],
+    "winner": "player1"
+  }
+]
